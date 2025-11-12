@@ -289,13 +289,21 @@
   background: #9ca3af;
 }
 
-/* Price Header */
+/* Price Header with Savings */
 .debate-price-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
   padding: 12px 16px;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   animation: priceAppear 0.4s ease-out both;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.price-section {
+  flex: 1;
 }
 
 .price-label {
@@ -310,6 +318,44 @@
   font-size: 20px;
   font-weight: 700;
   color: white;
+}
+
+.savings-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.savings-section .savings-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.savings-section .savings-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.savings-section .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.savings-section .stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+}
+
+.savings-section .stat-label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 @keyframes priceAppear {
@@ -389,61 +435,6 @@
   }
 }
 
-/* Savings Tracker */
-.savings-tracker {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  animation: savingsAppear 0.5s ease-out both;
-  animation-delay: 0.5s;
-}
-
-.savings-label {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
-
-.savings-stats {
-  display: flex;
-  justify-content: space-around;
-  gap: 16px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 2px;
-}
-
-.stat-label {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-@keyframes savingsAppear {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
 /* Toast Notification */
 .debate-toast {
   position: fixed;
@@ -501,17 +492,33 @@
     max-height: 120px;
   }
 
+  .debate-price-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
   .price-amount {
     font-size: 18px;
+  }
+
+  .savings-section {
+    align-self: stretch;
+    align-items: flex-start;
+  }
+
+  .savings-section .savings-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .savings-section .stat-value {
+    font-size: 14px;
   }
 
   .action-btn {
     padding: 8px 12px;
     font-size: 12px;
-  }
-
-  .stat-value {
-    font-size: 16px;
   }
 }
 

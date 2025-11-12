@@ -6,10 +6,25 @@
  */
 export function getModalTemplate() {
   return `
-    <!-- Price Header -->
+    <!-- Price Header with Savings -->
     <div class="debate-price-header">
-      <div class="price-label">You're considering:</div>
-      <div class="price-amount">--</div>
+      <div class="price-section">
+        <div class="price-label">You're considering:</div>
+        <div class="price-amount">--</div>
+      </div>
+      <div class="savings-section">
+        <div class="savings-label">This Month</div>
+        <div class="savings-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="saved-amount">$0</span>
+            <span class="stat-label">Saved</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="reconsidered-count">0</span>
+            <span class="stat-label">Reconsidered</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Enabler Character -->
@@ -62,21 +77,6 @@ export function getModalTemplate() {
       <button class="action-btn remind-btn">Remind Me Later</button>
       <button class="action-btn reconsider-btn">I'll Reconsider</button>
       <button class="action-btn proceed-btn">Proceed to Purchase</button>
-    </div>
-
-    <!-- Savings Tracker -->
-    <div class="savings-tracker">
-      <div class="savings-label">This Month</div>
-      <div class="savings-stats">
-        <div class="stat-item">
-          <span class="stat-value" id="saved-amount">$0</span>
-          <span class="stat-label">Saved</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="reconsidered-count">0</span>
-          <span class="stat-label">Reconsidered</span>
-        </div>
-      </div>
     </div>
 
     <!-- Close Button -->
