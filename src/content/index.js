@@ -23,7 +23,7 @@ function createDebateModal() {
         <!-- Enabler -->
         <div class="personality-card enabler">
           <div class="personality-header">
-            <div class="personality-icon">🎉</div>
+            <div class="personality-icon">+</div>
             <div class="personality-info">
               <h3>The Enabler</h3>
               <p class="personality-status">Waiting...</p>
@@ -35,7 +35,7 @@ function createDebateModal() {
         <!-- Skeptic -->
         <div class="personality-card skeptic">
           <div class="personality-header">
-            <div class="personality-icon">🤔</div>
+            <div class="personality-icon">?</div>
             <div class="personality-info">
               <h3>The Skeptic</h3>
               <p class="personality-status">Waiting...</p>
@@ -47,7 +47,7 @@ function createDebateModal() {
         <!-- Mediator -->
         <div class="personality-card mediator">
           <div class="personality-header">
-            <div class="personality-icon">⚖️</div>
+            <div class="personality-icon">=</div>
             <div class="personality-info">
               <h3>The Mediator</h3>
               <p class="personality-status">Waiting...</p>
