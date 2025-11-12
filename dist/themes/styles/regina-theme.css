@@ -1,0 +1,664 @@
+/**
+ * Regina Mode Theme Stylesheet
+ * "On Wednesdays We Wear Pink" - Mean Girls Shopping Experience
+ *
+ * This stylesheet applies when [data-theme="regina"] is set on the document root
+ */
+
+/* ============================================
+   COLOR VARIABLES - REGINA MODE
+   ============================================ */
+
+[data-theme="regina"] {
+  /* Primary Regina Pink Palette */
+  --regina-primary: linear-gradient(135deg, #FFB6D9 0%, #FF69B4 50%, #FF1493 100%);
+  --regina-pink-light: #FFE4F0;
+  --regina-pink-medium: #FFB6D9;
+  --regina-pink-hot: #FF69B4;
+  --regina-pink-deep: #FF1493;
+  --regina-pink-burn: #C71585;
+
+  /* The Plastics Gold Accent */
+  --plastics-gold: #FFD700;
+  --plastics-gold-light: #FFF8DC;
+
+  /* Supporting Cast Colors */
+  --gretchen-gradient: linear-gradient(135deg, #DDA0DD 0%, #BA55D3 100%);
+  --gretchen-border: #BA55D3;
+  --gretchen-accent: #9370DB;
+
+  --karen-gradient: linear-gradient(135deg, #FFE4E1 0%, #FFC0CB 100%);
+  --karen-border: #FFC0CB;
+  --karen-accent: #FFB6C1;
+
+  /* Neutral & Functional */
+  --text-primary: #2D1B2E;
+  --text-secondary: #6B4C6D;
+  --white-glossy: #FFFFFF;
+  --shadow-pink: rgba(255, 20, 147, 0.15);
+  --shadow-pink-strong: rgba(255, 20, 147, 0.3);
+
+  /* State Colors */
+  --success-green: #90EE90;
+  --burn-book-red: #8B0000;
+
+  /* Typography */
+  --font-headline: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent: 'Archivo Black', Impact, sans-serif;
+}
+
+/* Dark Mode Color Overrides */
+[data-theme="regina"][data-theme-mode="dark"] {
+  --regina-primary: linear-gradient(135deg, #C71585 0%, #8B008B 100%);
+  --regina-pink-light: #2D1B2E;
+  --text-primary: #FFE4F0;
+  --text-secondary: #DDA0DD;
+  --white-glossy: #1A0A1F;
+  --shadow-pink: rgba(199, 21, 133, 0.2);
+}
+
+
+/* ============================================
+   MODAL CONTAINER - REGINA STYLING
+   ============================================ */
+
+[data-theme="regina"] .debate-overlay {
+  background: var(--shadow-pink);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="regina"] .debate-container {
+  background: var(--white-glossy);
+  border: 3px solid var(--regina-pink-medium);
+  box-shadow: 0 24px 48px var(--shadow-pink-strong);
+  animation: reginaEntrance 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+
+/* ============================================
+   MODAL HEADER - "SHOPPING WITH THE PLASTICS"
+   ============================================ */
+
+[data-theme="regina"] .debate-header {
+  background: var(--regina-primary);
+  padding: 24px;
+  border-bottom: 2px solid var(--plastics-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shimmer effect on header */
+[data-theme="regina"] .debate-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+[data-theme="regina"] .debate-header h2 {
+  font-family: var(--font-headline);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--white-glossy);
+  text-align: center;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+}
+
+[data-theme="regina"] .debate-close {
+  background: var(--white-glossy);
+  color: var(--regina-pink-deep);
+  border: 2px solid var(--regina-pink-deep);
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+[data-theme="regina"] .debate-close:hover {
+  background: var(--regina-pink-deep);
+  color: var(--white-glossy);
+  transform: rotate(90deg) scale(1.1);
+}
+
+
+/* ============================================
+   PERSONALITY CARDS LAYOUT - HIERARCHY
+   ============================================ */
+
+[data-theme="regina"] .debate-content {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+/* Regina's card is larger and centered */
+[data-theme="regina"] .personality-card.regina {
+  order: 1;
+  width: 100%;
+  max-width: 650px;
+  transform: scale(1.05);
+}
+
+/* Gretchen and Karen flank below (or side-by-side on desktop) */
+[data-theme="regina"] .personality-sidekicks {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+  order: 2;
+}
+
+[data-theme="regina"] .personality-card.gretchen,
+[data-theme="regina"] .personality-card.karen {
+  flex: 1;
+  max-width: 380px;
+}
+
+@media (max-width: 768px) {
+  [data-theme="regina"] .personality-sidekicks {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  [data-theme="regina"] .personality-card.gretchen,
+  [data-theme="regina"] .personality-card.karen {
+    max-width: 100%;
+  }
+}
+
+
+/* ============================================
+   PERSONALITY CARDS - BASE STYLING
+   ============================================ */
+
+[data-theme="regina"] .personality-card {
+  background: var(--white-glossy);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 3px solid transparent;
+}
+
+
+/* ============================================
+   REGINA'S CARD - QUEEN BEE STYLING
+   ============================================ */
+
+[data-theme="regina"] .personality-card.regina {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF5FA 100%);
+  border-color: var(--regina-pink-deep);
+  position: relative;
+}
+
+/* Crown icon styling */
+[data-theme="regina"] .personality-card.regina .personality-icon {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 8px var(--shadow-pink));
+}
+
+[data-theme="regina"] .personality-card.regina .personality-name {
+  font-family: var(--font-headline);
+  font-size: 28px;
+  font-weight: 700;
+  background: var(--regina-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 8px 0;
+}
+
+[data-theme="regina"] .personality-card.regina .personality-response {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* Regina hover state - gold glow */
+[data-theme="regina"] .personality-card.regina:hover {
+  transform: translateY(-8px) scale(1.07);
+  box-shadow: 0 20px 40px var(--shadow-pink-strong);
+  border-color: var(--plastics-gold);
+}
+
+
+/* ============================================
+   GRETCHEN'S CARD - NERVOUS SKEPTIC
+   ============================================ */
+
+[data-theme="regina"] .personality-card.gretchen {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9F5FF 100%);
+  border-color: var(--gretchen-border);
+}
+
+[data-theme="regina"] .personality-card.gretchen .personality-icon {
+  font-size: 40px;
+}
+
+[data-theme="regina"] .personality-card.gretchen .personality-name {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--gretchen-border);
+}
+
+[data-theme="regina"] .personality-card.gretchen .personality-response {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Gretchen hover - nervous twitch */
+[data-theme="regina"] .personality-card.gretchen:hover {
+  transform: translateY(-4px) rotate(-2deg);
+  box-shadow: 0 10px 20px rgba(186, 85, 211, 0.2);
+}
+
+
+/* ============================================
+   KAREN'S CARD - DITZY MEDIATOR
+   ============================================ */
+
+[data-theme="regina"] .personality-card.karen {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%);
+  border-color: var(--karen-border);
+}
+
+[data-theme="regina"] .personality-card.karen .personality-icon {
+  font-size: 40px;
+}
+
+[data-theme="regina"] .personality-card.karen .personality-name {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--karen-border);
+}
+
+[data-theme="regina"] .personality-card.karen .personality-response {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Karen hover - clueless enthusiasm */
+[data-theme="regina"] .personality-card.karen:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+  box-shadow: 0 10px 20px rgba(255, 192, 203, 0.3);
+}
+
+
+/* ============================================
+   PERSONALITY CARD COMPONENTS
+   ============================================ */
+
+[data-theme="regina"] .personality-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid currentColor;
+  opacity: 0.3;
+}
+
+[data-theme="regina"] .personality-card.regina .personality-header {
+  border-bottom-color: var(--regina-pink-medium);
+}
+
+[data-theme="regina"] .personality-card.gretchen .personality-header {
+  border-bottom-color: var(--gretchen-border);
+}
+
+[data-theme="regina"] .personality-card.karen .personality-header {
+  border-bottom-color: var(--karen-border);
+}
+
+[data-theme="regina"] .personality-status {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: var(--regina-pink-light);
+  color: var(--regina-pink-deep);
+}
+
+[data-theme="regina"] .personality-status.thinking::after {
+  content: '...';
+  animation: ellipsis 1.5s infinite;
+}
+
+@keyframes ellipsis {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+
+/* ============================================
+   TEXT STREAMING EFFECT - SPARKLE
+   ============================================ */
+
+[data-theme="regina"] .personality-response .streaming-text:last-child {
+  animation: textSparkle 0.6s ease-out;
+}
+
+@keyframes textSparkle {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: none;
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow: 0 0 8px var(--regina-pink-hot);
+  }
+}
+
+
+/* ============================================
+   MODAL FOOTER - BUTTONS
+   ============================================ */
+
+[data-theme="regina"] .debate-footer {
+  padding: 24px;
+  background: linear-gradient(180deg, transparent 0%, var(--regina-pink-light) 100%);
+  border-top: 2px solid var(--regina-pink-medium);
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+
+/* ============================================
+   BUTTONS - REGINA STYLED
+   ============================================ */
+
+[data-theme="regina"] .debate-button {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  text-transform: none;
+}
+
+/* "That's So Fetch!" button */
+[data-theme="regina"] .debate-button.proceed {
+  background: var(--regina-primary);
+  color: var(--white-glossy);
+  box-shadow: 0 4px 12px var(--shadow-pink);
+}
+
+[data-theme="regina"] .debate-button.proceed::before {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 24px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+[data-theme="regina"] .debate-button.proceed:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px var(--shadow-pink-strong);
+}
+
+[data-theme="regina"] .debate-button.proceed:hover::before {
+  animation: sparkleTrail 0.6s ease-out;
+}
+
+@keyframes sparkleTrail {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+[data-theme="regina"] .debate-button.proceed:active {
+  transform: scale(0.98);
+}
+
+/* "Whatever" button */
+[data-theme="regina"] .debate-button.reconsider {
+  background: var(--white-glossy);
+  color: var(--text-secondary);
+  border: 2px solid var(--text-secondary);
+}
+
+[data-theme="regina"] .debate-button.reconsider:hover {
+  background: var(--text-secondary);
+  color: var(--white-glossy);
+  transform: scale(1.05);
+}
+
+[data-theme="regina"] .debate-button.reconsider:active {
+  transform: scale(0.98);
+}
+
+
+/* ============================================
+   MODAL ENTRANCE ANIMATION - "GRAND ENTRANCE"
+   ============================================ */
+
+@keyframes reginaEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  60% {
+    transform: scale(1.05) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+
+/* ============================================
+   LOADING STATES - REGINA THEMED
+   ============================================ */
+
+[data-theme="regina"] .debate-loading {
+  text-align: center;
+  padding: 48px;
+  font-family: var(--font-headline);
+  font-size: 24px;
+  color: var(--regina-pink-deep);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+[data-theme="regina"] .debate-loading::after {
+  content: ' 👑';
+  animation: rotate 2s linear infinite;
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* ============================================
+   ERROR STATES - BURN BOOK STYLE
+   ============================================ */
+
+[data-theme="regina"] .debate-error {
+  background: linear-gradient(135deg, #FFE4E4 0%, #FFB6B6 100%);
+  border: 2px solid var(--burn-book-red);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px;
+  text-align: center;
+  font-family: var(--font-body);
+  color: var(--burn-book-red);
+  font-weight: 600;
+}
+
+[data-theme="regina"] .debate-error::before {
+  content: '📖';
+  display: block;
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+
+/* ============================================
+   POPUP & OPTIONS PAGE THEMING
+   ============================================ */
+
+/* Popup background */
+[data-theme="regina"] .popup-container {
+  background: var(--regina-primary);
+  color: var(--white-glossy);
+}
+
+[data-theme="regina"] .popup-header {
+  font-family: var(--font-headline);
+  font-size: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="regina"] .status-badge {
+  background: var(--white-glossy);
+  color: var(--regina-pink-deep);
+  border: 2px solid var(--regina-pink-deep);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[data-theme="regina"] .status-badge.active {
+  background: var(--plastics-gold);
+  color: var(--text-primary);
+  border-color: var(--plastics-gold);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Test button */
+[data-theme="regina"] .test-button {
+  background: var(--white-glossy);
+  color: var(--regina-pink-deep);
+  border: 2px solid var(--regina-pink-deep);
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 24px;
+  transition: all 0.2s ease;
+}
+
+[data-theme="regina"] .test-button:hover {
+  background: var(--regina-pink-deep);
+  color: var(--white-glossy);
+  transform: scale(1.05);
+}
+
+/* Options page */
+[data-theme="regina"] .options-container {
+  background: linear-gradient(135deg, var(--regina-pink-light) 0%, var(--white-glossy) 100%);
+  min-height: 100vh;
+}
+
+[data-theme="regina"] .options-header {
+  background: var(--regina-primary);
+  color: var(--white-glossy);
+  padding: 32px;
+  text-align: center;
+  font-family: var(--font-headline);
+  font-size: 36px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="regina"] .info-box {
+  background: var(--regina-pink-light);
+  border-left: 4px solid var(--regina-pink-deep);
+  padding: 16px;
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+
+
+/* ============================================
+   ACCESSIBILITY - REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="regina"] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  [data-theme="regina"] .debate-header h2 {
+    font-size: 24px;
+  }
+
+  [data-theme="regina"] .debate-content {
+    padding: 20px 16px;
+  }
+
+  [data-theme="regina"] .personality-card.regina {
+    transform: scale(1);
+  }
+
+  [data-theme="regina"] .debate-footer {
+    flex-direction: column;
+  }
+
+  [data-theme="regina"] .debate-button {
+    width: 100%;
+  }
+}

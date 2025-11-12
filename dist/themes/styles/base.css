@@ -1,0 +1,424 @@
+/**
+ * Base Theme Infrastructure
+ * Shared CSS variables and base styles for all drama modes
+ *
+ * Each theme overrides these variables with theme-specific values
+ * This file provides sensible defaults and ensures consistency
+ */
+
+/* ============================================
+   ROOT DEFAULT VARIABLES
+   ============================================ */
+
+:root {
+  /* Typography System */
+  --font-headline: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-accent: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Font Sizes */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+
+  /* Spacing System */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  --transition-bounce: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index Scale */
+  --z-base: 1;
+  --z-overlay: 9998;
+  --z-modal: 9999;
+  --z-toast: 10000;
+
+  /* Default Theme Colors (Fallback) */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --background-primary: #FFFFFF;
+  --border-color: #E0E0E0;
+}
+
+
+/* ============================================
+   GLOBAL FONT IMPORTS
+   ============================================ */
+
+/* Google Fonts - Load only what's needed */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&family=Archivo+Black&display=swap');
+
+
+/* ============================================
+   BASE MODAL STRUCTURE (Theme-Agnostic)
+   ============================================ */
+
+.debate-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+.debate-container {
+  position: relative;
+  max-width: 900px;
+  max-height: 85vh;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-modal);
+  box-sizing: border-box;
+}
+
+.debate-header {
+  flex-shrink: 0;
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.debate-header h2 {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.debate-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+}
+
+.debate-close:hover {
+  transform: scale(1.1);
+}
+
+.debate-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+}
+
+/* Custom scrollbar styling */
+.debate-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.debate-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.debate-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-full);
+}
+
+.debate-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.debate-footer {
+  flex-shrink: 0;
+  padding: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+
+/* ============================================
+   PERSONALITY CARDS (Base Structure)
+   ============================================ */
+
+.personality-card {
+  background: var(--background-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  box-sizing: border-box;
+  transition: all var(--transition-bounce);
+}
+
+.personality-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid currentColor;
+}
+
+.personality-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.personality-name {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  margin: 0;
+  flex-grow: 1;
+}
+
+.personality-status {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.personality-response {
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--text-primary);
+  min-height: 60px;
+}
+
+
+/* ============================================
+   BUTTONS (Base Structure)
+   ============================================ */
+
+.debate-button {
+  padding: 14px 32px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.debate-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.debate-button:disabled:hover {
+  transform: none;
+}
+
+
+/* ============================================
+   LOADING & ERROR STATES (Base)
+   ============================================ */
+
+.debate-loading {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  font-size: var(--text-xl);
+}
+
+.debate-error {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-lg);
+  text-align: center;
+}
+
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .debate-container {
+    max-height: 90vh;
+  }
+
+  .debate-header h2 {
+    font-size: var(--text-xl);
+  }
+
+  .debate-content {
+    padding: var(--spacing-md);
+  }
+
+  .debate-footer {
+    flex-direction: column;
+  }
+
+  .debate-button {
+    width: 100%;
+  }
+
+  .personality-card {
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .debate-overlay {
+    padding: var(--spacing-md);
+  }
+
+  .debate-header {
+    padding: var(--spacing-md);
+  }
+
+  .debate-content {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .debate-footer {
+    padding: var(--spacing-md);
+  }
+}
+
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+
+/* Focus visible for keyboard navigation */
+.debate-button:focus-visible,
+.debate-close:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .debate-container {
+    border: 3px solid currentColor;
+  }
+
+  .personality-card {
+    border: 2px solid currentColor;
+  }
+}
+
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .debate-overlay {
+    position: static;
+    background: white;
+  }
+
+  .debate-close,
+  .debate-footer {
+    display: none;
+  }
+
+  .debate-container {
+    max-height: none;
+    box-shadow: none;
+  }
+}

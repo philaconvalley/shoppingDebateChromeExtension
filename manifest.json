@@ -24,5 +24,15 @@
   ],
   "action": {
     "default_popup": "popup/view.html"
-  }
+  },
+  "options_page": "options/view.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "themes/styles/*.css",
+        "content/debate-modal.css"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

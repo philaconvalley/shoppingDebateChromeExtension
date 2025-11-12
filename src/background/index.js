@@ -1,5 +1,6 @@
 // Background Service Worker - Handles OpenRouter API streaming
 import { OpenRouter } from '@openrouter/sdk';
+import { themeEngine } from '../themes/theme-engine.js';
 
 // Build array of development API keys from environment variables
 // Concatenate keys directly and filter out any empty ones
@@ -52,40 +53,16 @@ async function getModel() {
   return result.model || 'anthropic/claude-3-haiku';
 }
 
-// Build Enabler prompt
-function buildEnablerPrompt(productContext) {
-  return `You are "The Enabler" - an enthusiastic AI personality who finds genuine value in purchases.
-
-Product Context:
-${productContext}
-
-Your role: Find the real benefits and create vivid scenarios of how this purchase improves their life. Be specific about the product and price. Keep your response to 2-3 short paragraphs. Be enthusiastic but authentic.`;
-}
-
-// Build Skeptic prompt
-function buildSkepticPrompt(productContext) {
-  return `You are "The Skeptic" - a practical AI personality who questions purchase value.
-
-Product Context:
-${productContext}
-
-Your role: Raise practical questions about cost vs value. Compare to alternatives. Ask if they really need this now. Be specific about the product and price. Keep your response to 2-3 short paragraphs. Be thoughtful, not mean.`;
-}
-
-// Build Mediator prompt with context from previous responses
-function buildMediatorPrompt(productContext, enablerResponse, skepticResponse) {
-  return `You are "The Mediator" - a balanced AI personality who synthesizes perspectives using improv's "Yes, And..." technique.
-
-Product Context:
-${productContext}
-
-The Enabler said:
-${enablerResponse}
-
-The Skeptic said:
-${skepticResponse}
-
-Your role: Use "Yes, And..." to build on SPECIFIC points from both sides. Reference their actual arguments. Ask 2-3 insightful questions to help them decide. Keep your response to 2-3 short paragraphs. Be wise and balanced.`;
+/**
+ * Build dynamic prompt for any personality based on current theme
+ * @param {string} personalityId - Personality identifier (e.g., 'regina', 'gretchen', 'karen')
+ * @param {Object} productContext - Product information
+ * @param {Object} previousResponses - Previous character responses (for mediator role)
+ * @returns {string} Formatted prompt
+ */
+function buildPersonalityPrompt(personalityId, productContext, previousResponses = {}) {
+  // Use theme engine to build prompts dynamically
+  return themeEngine.buildPrompt(personalityId, productContext, previousResponses);
 }
 
 // Stream a single personality's response using OpenRouter SDK
@@ -183,7 +160,7 @@ async function streamPersonalityWithFallback(prompt, model, keys, tabId, persona
   }
 }
 
-// Handle streaming debate generation
+// Handle streaming debate generation using current theme
 async function handleStreamingDebate(productContext, tabId) {
   try {
     const apiKeys = await getApiKeys();
@@ -195,32 +172,48 @@ async function handleStreamingDebate(productContext, tabId) {
 
     console.log(`Using ${apiKeys.length} API key(s) with rotation and fallback`);
 
-    // Stream Enabler
-    const enablerResponse = await streamPersonalityWithFallback(
-      buildEnablerPrompt(productContext),
-      model,
-      apiKeys,
-      tabId,
-      'enabler'
-    );
+    // Ensure theme engine is initialized
+    await themeEngine.initialize();
 
-    // Stream Skeptic
-    const skepticResponse = await streamPersonalityWithFallback(
-      buildSkepticPrompt(productContext),
-      model,
-      apiKeys,
-      tabId,
-      'skeptic'
-    );
+    // Get response order from current theme
+    const responseOrder = themeEngine.getResponseOrder();
+    const personalities = themeEngine.getPersonalities();
 
-    // Stream Mediator with context from both
-    await streamPersonalityWithFallback(
-      buildMediatorPrompt(productContext, enablerResponse, skepticResponse),
-      model,
-      apiKeys,
-      tabId,
-      'mediator'
-    );
+    console.log(`[Theme: ${themeEngine.currentTheme}] Streaming ${responseOrder.length} personalities`);
+
+    // Store responses for mediator context
+    const responses = {};
+
+    // Stream each personality in order defined by theme
+    for (const personalityId of responseOrder) {
+      const personality = personalities.find(p => p.id === personalityId);
+
+      if (!personality) {
+        console.error(`Personality not found: ${personalityId}`);
+        continue;
+      }
+
+      // Build prompt based on role
+      let prompt;
+      if (personality.role === 'mediator') {
+        // Mediator gets previous responses
+        prompt = buildPersonalityPrompt(personalityId, productContext, responses);
+      } else {
+        prompt = buildPersonalityPrompt(personalityId, productContext);
+      }
+
+      // Stream this personality
+      const response = await streamPersonalityWithFallback(
+        prompt,
+        model,
+        apiKeys,
+        tabId,
+        personalityId // Use personality ID instead of generic role name
+      );
+
+      // Store response for next personality
+      responses[personality.role] = response;
+    }
 
     // Signal complete
     chrome.tabs.sendMessage(tabId, {

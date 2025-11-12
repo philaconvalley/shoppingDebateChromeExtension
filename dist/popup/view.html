@@ -98,6 +98,76 @@
       text-align: center;
       opacity: 0.8;
     }
+
+    .theme-selector {
+      margin-bottom: 16px;
+    }
+
+    .theme-selector label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .theme-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+
+    .theme-option:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .theme-option.active {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: white;
+    }
+
+    .theme-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .theme-option input[type="radio"] {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .theme-option-label {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .theme-icon {
+      font-size: 18px;
+    }
+
+    .theme-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -107,6 +177,13 @@
   <div class="status">
     <span class="status-indicator"></span>
     Extension is active
+  </div>
+
+  <div class="theme-selector">
+    <label>Drama Mode</label>
+    <div class="theme-options" id="themeOptions">
+      <!-- Theme options will be populated by JavaScript -->
+    </div>
   </div>
 
   <div class="actions">
