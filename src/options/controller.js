@@ -1,13 +1,22 @@
 // Options Page Controller
 
-const DEFAULT_MODEL = 'anthropic/claude-3-haiku';
+const DEFAULT_MODELS = {
+  enabler: 'anthropic/claude-3-haiku',
+  skeptic: 'anthropic/claude-3.5-sonnet',
+  mediator: 'anthropic/claude-3-opus'
+};
 
 // Load saved settings
 async function loadSettings() {
-  const result = await chrome.storage.sync.get(['apiKey', 'model']);
+  const result = await chrome.storage.sync.get(['apiKey', 'models']);
 
   document.getElementById('apiKey').value = result.apiKey || '';
-  document.getElementById('model').value = result.model || DEFAULT_MODEL;
+
+  // Load personality-specific models
+  const models = result.models || DEFAULT_MODELS;
+  document.getElementById('modelEnabler').value = models.enabler || DEFAULT_MODELS.enabler;
+  document.getElementById('modelSkeptic').value = models.skeptic || DEFAULT_MODELS.skeptic;
+  document.getElementById('modelMediator').value = models.mediator || DEFAULT_MODELS.mediator;
 }
 
 // Save settings
@@ -15,7 +24,11 @@ async function saveSettings(e) {
   e.preventDefault();
 
   const apiKey = document.getElementById('apiKey').value.trim();
-  const model = document.getElementById('model').value;
+  const models = {
+    enabler: document.getElementById('modelEnabler').value,
+    skeptic: document.getElementById('modelSkeptic').value,
+    mediator: document.getElementById('modelMediator').value
+  };
 
   // Validate API key format
   if (apiKey && !apiKey.startsWith('sk-or-')) {
@@ -24,7 +37,7 @@ async function saveSettings(e) {
   }
 
   // Save to Chrome storage
-  await chrome.storage.sync.set({ apiKey, model });
+  await chrome.storage.sync.set({ apiKey, models });
 
   showStatus('Settings saved successfully!', 'success');
 }
