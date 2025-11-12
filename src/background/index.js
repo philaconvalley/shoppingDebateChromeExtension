@@ -58,27 +58,30 @@ async function getModels() {
 
 // Build Enabler prompt
 function buildEnablerPrompt(productContext) {
-  return `You are "The Enabler" - an enthusiastic AI personality who finds genuine value in purchases.
+  return `You are "The Enabler" - an enthusiastic AI personality who finds genuine value in purchases. You're starting a friendly debate.
 
 Product Context:
 ${productContext}
 
-Your role: Find the real benefits and create vivid scenarios of how this purchase improves their life. Be specific about the product and price. Keep your response to 2-3 short paragraphs. Be enthusiastic but authentic.`;
+Your role: Find the real benefits and create vivid scenarios of how this purchase improves their life. IMPORTANT: Mention the specific price in your first sentence and frame it as valuable. Explain why the price is worth it. Keep your response to 2-3 short paragraphs. Be enthusiastic but authentic. Remember, The Skeptic will respond to your points, so make strong, specific arguments they can engage with.`;
 }
 
-// Build Skeptic prompt
-function buildSkepticPrompt(productContext) {
+// Build Skeptic prompt with Enabler's response
+function buildSkepticPrompt(productContext, enablerResponse) {
   return `You are "The Skeptic" - a practical AI personality who questions purchase value.
 
 Product Context:
 ${productContext}
 
-Your role: Raise practical questions about cost vs value. Compare to alternatives. Ask if they really need this now. Be specific about the product and price. Keep your response to 2-3 short paragraphs. Be thoughtful, not mean.`;
+The Enabler just said:
+${enablerResponse}
+
+Your role: Respond directly to The Enabler's points. IMPORTANT: Reference the specific price amount and question if it's truly worth it. Counter their enthusiasm with practical concerns about cost vs value. Suggest cheaper alternatives or point out what else could be bought with that money. Ask if they really need this now. Keep your response to 2-3 short paragraphs. Be conversational and thoughtful, not mean. Start by acknowledging what The Enabler said before presenting your counter-perspective.`;
 }
 
 // Build Mediator prompt with context from previous responses
 function buildMediatorPrompt(productContext, enablerResponse, skepticResponse) {
-  return `You are "The Mediator" - a balanced AI personality who synthesizes perspectives using improv's "Yes, And..." technique.
+  return `You are "The Mediator" - a balanced AI personality who synthesizes perspectives using improv's "Yes, And..." technique. You're concluding a friendly debate.
 
 Product Context:
 ${productContext}
@@ -86,10 +89,10 @@ ${productContext}
 The Enabler said:
 ${enablerResponse}
 
-The Skeptic said:
+The Skeptic responded:
 ${skepticResponse}
 
-Your role: Use "Yes, And..." to build on SPECIFIC points from both sides. Reference their actual arguments. Ask 2-3 insightful questions to help them decide. Keep your response to 2-3 short paragraphs. Be wise and balanced.`;
+Your role: You've heard both sides of this conversation. Use "Yes, And..." to build on SPECIFIC points from both The Enabler and The Skeptic. IMPORTANT: Acknowledge the price and help the user evaluate if it aligns with their values and budget. Quote or reference their actual arguments by name ("The Enabler pointed out..." or "The Skeptic raised concerns about..."). Acknowledge the back-and-forth between them. Ask 2-3 insightful questions about timing, budget, and actual need to help the user decide. Keep your response to 2-3 short paragraphs. Be wise, balanced, and conversational.`;
 }
 
 // Stream a single personality's response using OpenRouter SDK
@@ -209,9 +212,9 @@ async function handleStreamingDebate(productContext, tabId) {
       'enabler'
     );
 
-    // Stream Skeptic
+    // Stream Skeptic - now responds to Enabler
     const skepticResponse = await streamPersonalityWithFallback(
-      buildSkepticPrompt(productContext),
+      buildSkepticPrompt(productContext, enablerResponse),
       models.skeptic,
       apiKeys,
       tabId,

@@ -3,127 +3,254 @@ import { isCheckoutPage, extractProductContext } from './checkout.js';
 
 let debateModal = null;
 let isDebateActive = false;
+let currentProduct = null; // Store current product for reminders/tracking
 
-// Create the debate modal UI
+// Create the debate character UI
 function createDebateModal() {
   if (debateModal) return debateModal;
 
   const modal = document.createElement('div');
-  modal.id = 'shopping-debate-modal';
+  modal.id = 'shopping-debate-characters';
   modal.innerHTML = `
-    <div class="debate-overlay"></div>
-    <div class="debate-container">
-      <div class="debate-header">
-        <h2>Shopping Debate</h2>
-        <p>Three AI personalities discuss your purchase</p>
-        <button class="debate-close">&times;</button>
+    <!-- Price Header -->
+    <div class="debate-price-header">
+      <div class="price-label">You're considering:</div>
+      <div class="price-amount">--</div>
+    </div>
+
+    <!-- Enabler Character -->
+    <div class="debate-character enabler-character">
+      <div class="character-avatar">
+        <div class="avatar-icon">+</div>
+        <div class="avatar-pulse"></div>
       </div>
-
-      <div class="debate-content">
-        <!-- Enabler -->
-        <div class="personality-card enabler">
-          <div class="personality-header">
-            <div class="personality-icon">+</div>
-            <div class="personality-info">
-              <h3>The Enabler</h3>
-              <p class="personality-status">Waiting...</p>
-            </div>
-          </div>
-          <div class="personality-response"></div>
+      <div class="speech-bubble">
+        <div class="bubble-header">
+          <span class="bubble-name">The Enabler</span>
+          <span class="bubble-status">...</span>
         </div>
-
-        <!-- Skeptic -->
-        <div class="personality-card skeptic">
-          <div class="personality-header">
-            <div class="personality-icon">?</div>
-            <div class="personality-info">
-              <h3>The Skeptic</h3>
-              <p class="personality-status">Waiting...</p>
-            </div>
-          </div>
-          <div class="personality-response"></div>
-        </div>
-
-        <!-- Mediator -->
-        <div class="personality-card mediator">
-          <div class="personality-header">
-            <div class="personality-icon">=</div>
-            <div class="personality-info">
-              <h3>The Mediator</h3>
-              <p class="personality-status">Waiting...</p>
-            </div>
-          </div>
-          <div class="personality-response"></div>
-        </div>
-      </div>
-
-      <div class="debate-footer">
-        <button class="debate-button proceed">Proceed to Checkout</button>
-        <button class="debate-button reconsider">Reconsider Purchase</button>
+        <div class="bubble-content"></div>
       </div>
     </div>
+
+    <!-- Skeptic Character -->
+    <div class="debate-character skeptic-character">
+      <div class="character-avatar">
+        <div class="avatar-icon">?</div>
+        <div class="avatar-pulse"></div>
+      </div>
+      <div class="speech-bubble">
+        <div class="bubble-header">
+          <span class="bubble-name">The Skeptic</span>
+          <span class="bubble-status">...</span>
+        </div>
+        <div class="bubble-content"></div>
+      </div>
+    </div>
+
+    <!-- Mediator Character -->
+    <div class="debate-character mediator-character">
+      <div class="character-avatar">
+        <div class="avatar-icon">=</div>
+        <div class="avatar-pulse"></div>
+      </div>
+      <div class="speech-bubble">
+        <div class="bubble-header">
+          <span class="bubble-name">The Mediator</span>
+          <span class="bubble-status">...</span>
+        </div>
+        <div class="bubble-content"></div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="debate-actions">
+      <button class="action-btn remind-btn">Remind Me Later</button>
+      <button class="action-btn reconsider-btn">I'll Reconsider</button>
+      <button class="action-btn proceed-btn">Proceed to Purchase</button>
+    </div>
+
+    <!-- Savings Tracker -->
+    <div class="savings-tracker">
+      <div class="savings-label">This Month</div>
+      <div class="savings-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="saved-amount">$0</span>
+          <span class="stat-label">Saved</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="reconsidered-count">0</span>
+          <span class="stat-label">Reconsidered</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Close Button -->
+    <button class="debate-close-btn">&times;</button>
   `;
 
   document.body.appendChild(modal);
 
   // Add event listeners
-  modal.querySelector('.debate-close').addEventListener('click', closeDebateModal);
-  modal.querySelector('.debate-overlay').addEventListener('click', closeDebateModal);
-  modal.querySelector('.proceed').addEventListener('click', () => {
-    closeDebateModal();
-  });
-  modal.querySelector('.reconsider').addEventListener('click', () => {
-    closeDebateModal();
-    window.history.back();
-  });
+  modal.querySelector('.debate-close-btn').addEventListener('click', closeDebateModal);
+  modal.querySelector('.remind-btn').addEventListener('click', handleRemindLater);
+  modal.querySelector('.reconsider-btn').addEventListener('click', handleReconsider);
+  modal.querySelector('.proceed-btn').addEventListener('click', handleProceed);
 
   debateModal = modal;
   return modal;
 }
 
-// Show the debate modal
+// Handle Remind Me Later
+async function handleRemindLater() {
+  if (!currentProduct) return;
+
+  // Save reminder with 3-day timestamp
+  const reminder = {
+    product: currentProduct,
+    remindAt: Date.now() + (3 * 24 * 60 * 60 * 1000), // 3 days
+    url: window.location.href
+  };
+
+  const { reminders = [] } = await chrome.storage.local.get(['reminders']);
+  reminders.push(reminder);
+  await chrome.storage.local.set({ reminders });
+
+  alert('Reminder set for 3 days from now!');
+  closeDebateModal();
+}
+
+// Handle Reconsider (tracks savings)
+async function handleReconsider() {
+  if (!currentProduct) return;
+
+  await trackSavings(currentProduct.price);
+  alert(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`);
+  closeDebateModal();
+}
+
+// Handle Proceed to Purchase
+function handleProceed() {
+  closeDebateModal();
+}
+
+// Track savings when user reconsiders
+async function trackSavings(priceString) {
+  const price = extractPriceValue(priceString);
+  if (price <= 0) return;
+
+  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const { savings = {} } = await chrome.storage.local.get(['savings']);
+
+  if (!savings[currentMonth]) {
+    savings[currentMonth] = { amount: 0, count: 0 };
+  }
+
+  savings[currentMonth].amount += price;
+  savings[currentMonth].count += 1;
+
+  await chrome.storage.local.set({ savings });
+  updateSavingsDisplay();
+}
+
+// Extract numeric price from string
+function extractPriceValue(priceString) {
+  if (!priceString) return 0;
+  const match = priceString.match(/[\d,]+\.?\d*/);
+  if (!match) return 0;
+  return parseFloat(match[0].replace(/,/g, ''));
+}
+
+// Update savings display
+async function updateSavingsDisplay() {
+  if (!debateModal) return;
+
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const { savings = {} } = await chrome.storage.local.get(['savings']);
+  const monthData = savings[currentMonth] || { amount: 0, count: 0 };
+
+  const amountEl = debateModal.querySelector('#saved-amount');
+  const countEl = debateModal.querySelector('#reconsidered-count');
+
+  if (amountEl) amountEl.textContent = `$${monthData.amount.toFixed(0)}`;
+  if (countEl) countEl.textContent = monthData.count;
+}
+
+// Update price display
+function updatePriceDisplay(price) {
+  if (!debateModal) return;
+
+  const priceEl = debateModal.querySelector('.price-amount');
+  if (priceEl) {
+    priceEl.textContent = price || 'Price not detected';
+  }
+}
+
+// Show the debate characters
 function showDebateModal() {
   const modal = createDebateModal();
   modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  // Characters slide in - no need to hide page overflow
 }
 
-// Close the debate modal
+// Close the debate characters
 function closeDebateModal() {
   if (debateModal) {
     debateModal.classList.remove('active');
-    document.body.style.overflow = '';
+    setTimeout(() => {
+      debateModal.remove();
+      debateModal = null;
+    }, 300); // Wait for slide-out animation
     isDebateActive = false;
   }
 }
 
 // Update personality status
 function updatePersonalityStatus(personality, status) {
-  const card = debateModal.querySelector(`.personality-card.${personality}`);
-  if (card) {
-    const statusEl = card.querySelector('.personality-status');
+  const character = debateModal.querySelector(`.${personality}-character`);
+  if (character) {
+    const statusEl = character.querySelector('.bubble-status');
     statusEl.textContent = status;
+
+    // Add active class when speaking
+    if (status === 'Speaking...') {
+      character.classList.add('speaking');
+
+      // Scroll character into view smoothly
+      character.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      character.classList.remove('speaking');
+    }
   }
 }
 
 // Append chunk to personality response
 function appendPersonalityChunk(personality, chunk) {
-  const card = debateModal.querySelector(`.personality-card.${personality}`);
-  if (card) {
-    const responseEl = card.querySelector('.personality-response');
-    responseEl.textContent += chunk;
+  const character = debateModal.querySelector(`.${personality}-character`);
+  if (character) {
+    const bubbleContent = character.querySelector('.bubble-content');
+    bubbleContent.textContent += chunk;
+
+    // Show bubble if first chunk
+    const bubble = character.querySelector('.speech-bubble');
+    if (!bubble.classList.contains('visible')) {
+      bubble.classList.add('visible');
+    }
 
     // Auto-scroll
-    responseEl.scrollTop = responseEl.scrollHeight;
+    bubbleContent.scrollTop = bubbleContent.scrollHeight;
   }
 }
 
 // Clear personality response
 function clearPersonalityResponse(personality) {
-  const card = debateModal.querySelector(`.personality-card.${personality}`);
-  if (card) {
-    const responseEl = card.querySelector('.personality-response');
-    responseEl.textContent = '';
+  const character = debateModal.querySelector(`.${personality}-character`);
+  if (character) {
+    const bubbleContent = character.querySelector('.bubble-content');
+    bubbleContent.textContent = '';
+
+    const bubble = character.querySelector('.speech-bubble');
+    bubble.classList.remove('visible');
   }
 }
 
@@ -143,9 +270,22 @@ function startDebate() {
   // Extract context and send to background
   const productContext = extractProductContext();
 
+  // Extract and store current product info
+  currentProduct = {
+    url: productContext.url,
+    title: productContext.title,
+    price: productContext.prices?.[0] || 'Price not detected'
+  };
+
+  // Update price display
+  updatePriceDisplay(currentProduct.price);
+
+  // Update savings display
+  updateSavingsDisplay();
+
   chrome.runtime.sendMessage({
     type: 'generateDebateStreaming',
-    productContext: productContext
+    productContext: productContext.formatted
   });
 }
 
@@ -179,15 +319,41 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Auto-trigger on checkout pages
+// Check if price meets threshold
+async function shouldTriggerDebate() {
+  const { priceThreshold = 50 } = await chrome.storage.sync.get(['priceThreshold']);
+
+  // Extract product context to get price
+  const productContext = extractProductContext();
+
+  if (productContext.prices.length === 0) {
+    // No price detected, trigger anyway
+    return true;
+  }
+
+  // Get the first price and extract numeric value
+  const priceString = productContext.prices[0];
+  const priceValue = extractPriceValue(priceString);
+
+  // Trigger if price meets or exceeds threshold
+  return priceValue >= priceThreshold;
+}
+
+// Auto-trigger on checkout pages with price threshold check
 if (isCheckoutPage()) {
   // Wait for page to be fully loaded
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(startDebate, 1000);
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (await shouldTriggerDebate()) {
+        setTimeout(startDebate, 1000);
+      }
     });
   } else {
-    setTimeout(startDebate, 1000);
+    shouldTriggerDebate().then(shouldTrigger => {
+      if (shouldTrigger) {
+        setTimeout(startDebate, 1000);
+      }
+    });
   }
 }
 

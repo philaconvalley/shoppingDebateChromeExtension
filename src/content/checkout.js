@@ -86,5 +86,12 @@ export function extractProductContext() {
     formattedContext += `Prices: ${context.prices.slice(0, 3).join(', ')}\n`;
   }
 
-  return formattedContext;
+  // Return both formatted string and raw context
+  return {
+    formatted: formattedContext,
+    prices: context.prices,
+    products: context.products,
+    url: context.url,
+    title: context.title
+  };
 }

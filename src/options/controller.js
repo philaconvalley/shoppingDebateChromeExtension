@@ -8,9 +8,10 @@ const DEFAULT_MODELS = {
 
 // Load saved settings
 async function loadSettings() {
-  const result = await chrome.storage.sync.get(['apiKey', 'models']);
+  const result = await chrome.storage.sync.get(['apiKey', 'models', 'priceThreshold']);
 
   document.getElementById('apiKey').value = result.apiKey || '';
+  document.getElementById('priceThreshold').value = result.priceThreshold !== undefined ? result.priceThreshold : 50;
 
   // Load personality-specific models
   const models = result.models || DEFAULT_MODELS;
@@ -24,6 +25,7 @@ async function saveSettings(e) {
   e.preventDefault();
 
   const apiKey = document.getElementById('apiKey').value.trim();
+  const priceThreshold = parseFloat(document.getElementById('priceThreshold').value) || 0;
   const models = {
     enabler: document.getElementById('modelEnabler').value,
     skeptic: document.getElementById('modelSkeptic').value,
@@ -36,8 +38,14 @@ async function saveSettings(e) {
     return;
   }
 
+  // Validate price threshold
+  if (priceThreshold < 0) {
+    showStatus('Price threshold must be 0 or greater', 'error');
+    return;
+  }
+
   // Save to Chrome storage
-  await chrome.storage.sync.set({ apiKey, models });
+  await chrome.storage.sync.set({ apiKey, models, priceThreshold });
 
   showStatus('Settings saved successfully!', 'success');
 }
