@@ -30,5 +30,14 @@
   "options_ui": {
     "page": "options/view.html",
     "open_in_tab": true
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "themes/styles/*.css",
+        "content/debate-modal.css"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

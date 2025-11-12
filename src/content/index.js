@@ -21,10 +21,12 @@ import {
   attachReconsiderHandler,
   attachProceedHandler
 } from './ui/modal.js';
+import { initializeTheme, getCharacterConfig, getCurrentTheme, THEMES, getThemeConfig } from '../themes/theme-switcher.js';
 
 // Application state
 let isDebateActive = false;
 let currentProduct = null;
+let currentTheme = THEMES.DEFAULT;
 
 // Audio playback queue system
 const audioQueue = [];
@@ -340,11 +342,11 @@ function handleClose() {
 /**
  * Start the debate
  */
-function startDebate() {
+async function startDebate() {
   if (isDebateActive) return;
 
   isDebateActive = true;
-  showDebateModal();
+  await showDebateModal();
 
   // Attach event handlers
   attachCloseHandler(handleClose);
@@ -472,6 +474,40 @@ if (isCheckoutPage()) {
       }
     });
   }
+}
+
+// Initialize theme on page load
+initializeTheme().then(theme => {
+  console.log(`[ShoppingDebate] Content script loaded with theme: ${theme}`);
+});
+
+// Listen for theme changes from popup
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === 'THEME_CHANGED') {
+    console.log(`[ThemeChange] Switching to: ${message.themeId}`);
+    currentTheme = message.themeId;
+    // Force modal recreation on next open
+    if (debateModal) {
+      debateModal.remove();
+      debateModal = null;
+    }
+    initializeTheme();
+  }
+});
+
+// Toggle sound
+async function toggleSound() {
+  const { sound = true } = await chrome.storage.sync.get(['sound']);
+  await chrome.storage.sync.set({ sound: !sound });
+  updateSoundToggle();
+}
+
+// Update sound toggle
+async function updateSoundToggle() {
+  if (!debateModal) return;
+  const { sound = true } = await chrome.storage.sync.get(['sound']);
+  const btn = debateModal.querySelector('#sound-toggle-btn');
+  if (btn) btn.textContent = sound ? '🔊' : '🔇';
 }
 
 console.log('Shopping Debate content script loaded');

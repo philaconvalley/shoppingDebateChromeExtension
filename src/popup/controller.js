@@ -5,6 +5,60 @@ import { getSyncStorage, setSyncStorage, getLocalStorage, setLocalStorage } from
 
 console.log('[INFO] Shopping Debate popup loaded - API keys embedded from .env');
 
+// Theme management
+async function getCurrentTheme() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['theme'], (result) => {
+      resolve(result.theme || 'default');
+    });
+  });
+}
+
+async function saveTheme(themeId) {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ theme: themeId }, resolve);
+  });
+}
+
+// Initialize theme toggle
+async function initializeThemeToggle() {
+  const currentTheme = await getCurrentTheme();
+
+  // Set active state
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.theme === currentTheme) {
+      btn.classList.add('active');
+    }
+  });
+
+  // Add click listeners
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const themeId = btn.dataset.theme;
+
+      // Update UI
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Save theme
+      await saveTheme(themeId);
+      console.log(`[Theme] Switched to: ${themeId}`);
+
+      // Notify all tabs
+      const tabs = await chrome.tabs.query({});
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          type: 'THEME_CHANGED',
+          themeId: themeId
+        }).catch(() => {
+          // Ignore errors for tabs without content script
+        });
+      });
+    });
+  });
+}
+
 // Load current model selections
 async function loadModels() {
   const result = await getSyncStorage(['models']);
@@ -108,6 +162,11 @@ async function deleteReminder(index) {
   loadReminders(); // Reload the list
 }
 
-// Load models and reminders on popup open
-loadModels();
-loadReminders();
+// Initialize popup
+async function initializePopup() {
+  await loadModels();
+  await loadReminders();
+  await initializeThemeToggle();
+}
+
+initializePopup();
