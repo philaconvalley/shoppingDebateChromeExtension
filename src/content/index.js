@@ -101,6 +101,23 @@ function createDebateModal() {
   return modal;
 }
 
+// Show toast notification
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `debate-toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => toast.classList.add('show'), 10);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 // Handle Remind Me Later
 async function handleRemindLater() {
   if (!currentProduct) return;
@@ -116,7 +133,7 @@ async function handleRemindLater() {
   reminders.push(reminder);
   await chrome.storage.local.set({ reminders });
 
-  alert('Reminder set for 3 days from now!');
+  showToast('Reminder set for 3 days from now!', 'info');
   closeDebateModal();
 }
 
@@ -125,7 +142,7 @@ async function handleReconsider() {
   if (!currentProduct) return;
 
   await trackSavings(currentProduct.price);
-  alert(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`);
+  showToast(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`, 'success');
   closeDebateModal();
 }
 
@@ -310,7 +327,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'debateError') {
     console.error('Debate error:', message.error);
-    alert(`Error: ${message.error}`);
+    showToast(`Error: ${message.error}`, 'error');
     closeDebateModal();
   }
 
