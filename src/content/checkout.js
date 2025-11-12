@@ -1,16 +1,6 @@
 // Checkout Detection Logic
 
-// URL patterns that indicate checkout pages
-const CHECKOUT_PATTERNS = [
-  /checkout/i,
-  /cart/i,
-  /basket/i,
-  /payment/i,
-  /billing/i,
-  /order/i,
-  /purchase/i,
-  /pay/i
-];
+import { CHECKOUT_PATTERNS } from '../shared/constants.js';
 
 // Check if current page is a checkout page
 export function isCheckoutPage() {

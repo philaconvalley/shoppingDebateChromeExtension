@@ -1,285 +1,85 @@
-// Content Script - Debate Modal and Message Handling
+// Content Script - Main Orchestrator
+
 import { isCheckoutPage, extractProductContext } from './checkout.js';
+import { getPriceThreshold } from '../shared/storage.js';
+import { MESSAGE_TYPES, PERSONALITIES, TOAST_TYPES, DEFAULT_PRICE_THRESHOLD } from '../shared/constants.js';
+import { extractPriceValue } from './utils/price.js';
+import { trackSavings, updateSavingsDisplay } from './services/savings.js';
+import { createReminder } from './services/reminders.js';
+import { showToast } from './ui/toast.js';
+import {
+  createDebateModal,
+  showDebateModal,
+  closeDebateModal,
+  getDebateModal,
+  updatePersonalityStatus,
+  appendPersonalityChunk,
+  clearPersonalityResponse,
+  updatePriceDisplay,
+  attachCloseHandler,
+  attachRemindHandler,
+  attachReconsiderHandler,
+  attachProceedHandler
+} from './ui/modal.js';
 
-let debateModal = null;
+// Application state
 let isDebateActive = false;
-let currentProduct = null; // Store current product for reminders/tracking
+let currentProduct = null;
 
-// Create the debate character UI
-function createDebateModal() {
-  if (debateModal) return debateModal;
-
-  const modal = document.createElement('div');
-  modal.id = 'shopping-debate-characters';
-  modal.innerHTML = `
-    <!-- Price Header -->
-    <div class="debate-price-header">
-      <div class="price-label">You're considering:</div>
-      <div class="price-amount">--</div>
-    </div>
-
-    <!-- Enabler Character -->
-    <div class="debate-character enabler-character">
-      <div class="character-avatar">
-        <div class="avatar-icon">+</div>
-        <div class="avatar-pulse"></div>
-      </div>
-      <div class="speech-bubble">
-        <div class="bubble-header">
-          <span class="bubble-name">The Enabler</span>
-          <span class="bubble-status">...</span>
-        </div>
-        <div class="bubble-content"></div>
-      </div>
-    </div>
-
-    <!-- Skeptic Character -->
-    <div class="debate-character skeptic-character">
-      <div class="character-avatar">
-        <div class="avatar-icon">?</div>
-        <div class="avatar-pulse"></div>
-      </div>
-      <div class="speech-bubble">
-        <div class="bubble-header">
-          <span class="bubble-name">The Skeptic</span>
-          <span class="bubble-status">...</span>
-        </div>
-        <div class="bubble-content"></div>
-      </div>
-    </div>
-
-    <!-- Mediator Character -->
-    <div class="debate-character mediator-character">
-      <div class="character-avatar">
-        <div class="avatar-icon">=</div>
-        <div class="avatar-pulse"></div>
-      </div>
-      <div class="speech-bubble">
-        <div class="bubble-header">
-          <span class="bubble-name">The Mediator</span>
-          <span class="bubble-status">...</span>
-        </div>
-        <div class="bubble-content"></div>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="debate-actions">
-      <button class="action-btn remind-btn">Remind Me Later</button>
-      <button class="action-btn reconsider-btn">I'll Reconsider</button>
-      <button class="action-btn proceed-btn">Proceed to Purchase</button>
-    </div>
-
-    <!-- Savings Tracker -->
-    <div class="savings-tracker">
-      <div class="savings-label">This Month</div>
-      <div class="savings-stats">
-        <div class="stat-item">
-          <span class="stat-value" id="saved-amount">$0</span>
-          <span class="stat-label">Saved</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="reconsidered-count">0</span>
-          <span class="stat-label">Reconsidered</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Close Button -->
-    <button class="debate-close-btn">&times;</button>
-  `;
-
-  document.body.appendChild(modal);
-
-  // Add event listeners
-  modal.querySelector('.debate-close-btn').addEventListener('click', closeDebateModal);
-  modal.querySelector('.remind-btn').addEventListener('click', handleRemindLater);
-  modal.querySelector('.reconsider-btn').addEventListener('click', handleReconsider);
-  modal.querySelector('.proceed-btn').addEventListener('click', handleProceed);
-
-  debateModal = modal;
-  return modal;
-}
-
-// Show toast notification
-function showToast(message, type = 'success') {
-  const toast = document.createElement('div');
-  toast.className = `debate-toast ${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  // Trigger animation
-  setTimeout(() => toast.classList.add('show'), 10);
-
-  // Remove after 3 seconds
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// Handle Remind Me Later
+/**
+ * Handle Remind Me Later button click
+ */
 async function handleRemindLater() {
   if (!currentProduct) return;
 
-  // Save reminder with 3-day timestamp
-  const reminder = {
-    product: currentProduct,
-    remindAt: Date.now() + (3 * 24 * 60 * 60 * 1000), // 3 days
-    url: window.location.href
-  };
-
-  const { reminders = [] } = await chrome.storage.local.get(['reminders']);
-  reminders.push(reminder);
-  await chrome.storage.local.set({ reminders });
-
-  showToast('Reminder set for 3 days from now!', 'info');
+  await createReminder(currentProduct, window.location.href);
+  showToast('Reminder set for 3 days from now!', TOAST_TYPES.INFO);
   closeDebateModal();
 }
 
-// Handle Reconsider (tracks savings)
+/**
+ * Handle Reconsider button click
+ */
 async function handleReconsider() {
   if (!currentProduct) return;
 
   await trackSavings(currentProduct.price);
-  showToast(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`, 'success');
+  showToast(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`, TOAST_TYPES.SUCCESS);
   closeDebateModal();
 }
 
-// Handle Proceed to Purchase
+/**
+ * Handle Proceed to Purchase button click
+ */
 function handleProceed() {
   closeDebateModal();
 }
 
-// Track savings when user reconsiders
-async function trackSavings(priceString) {
-  const price = extractPriceValue(priceString);
-  if (price <= 0) return;
-
-  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const { savings = {} } = await chrome.storage.local.get(['savings']);
-
-  if (!savings[currentMonth]) {
-    savings[currentMonth] = { amount: 0, count: 0 };
-  }
-
-  savings[currentMonth].amount += price;
-  savings[currentMonth].count += 1;
-
-  await chrome.storage.local.set({ savings });
-  updateSavingsDisplay();
+/**
+ * Handle close button click
+ */
+function handleClose() {
+  closeDebateModal();
+  isDebateActive = false;
 }
 
-// Extract numeric price from string
-function extractPriceValue(priceString) {
-  if (!priceString) return 0;
-  const match = priceString.match(/[\d,]+\.?\d*/);
-  if (!match) return 0;
-  return parseFloat(match[0].replace(/,/g, ''));
-}
-
-// Update savings display
-async function updateSavingsDisplay() {
-  if (!debateModal) return;
-
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const { savings = {} } = await chrome.storage.local.get(['savings']);
-  const monthData = savings[currentMonth] || { amount: 0, count: 0 };
-
-  const amountEl = debateModal.querySelector('#saved-amount');
-  const countEl = debateModal.querySelector('#reconsidered-count');
-
-  if (amountEl) amountEl.textContent = `$${monthData.amount.toFixed(0)}`;
-  if (countEl) countEl.textContent = monthData.count;
-}
-
-// Update price display
-function updatePriceDisplay(price) {
-  if (!debateModal) return;
-
-  const priceEl = debateModal.querySelector('.price-amount');
-  if (priceEl) {
-    priceEl.textContent = price || 'Price not detected';
-  }
-}
-
-// Show the debate characters
-function showDebateModal() {
-  const modal = createDebateModal();
-  modal.classList.add('active');
-  // Characters slide in - no need to hide page overflow
-}
-
-// Close the debate characters
-function closeDebateModal() {
-  if (debateModal) {
-    debateModal.classList.remove('active');
-    setTimeout(() => {
-      debateModal.remove();
-      debateModal = null;
-    }, 300); // Wait for slide-out animation
-    isDebateActive = false;
-  }
-}
-
-// Update personality status
-function updatePersonalityStatus(personality, status) {
-  const character = debateModal.querySelector(`.${personality}-character`);
-  if (character) {
-    const statusEl = character.querySelector('.bubble-status');
-    statusEl.textContent = status;
-
-    // Add active class when speaking
-    if (status === 'Speaking...') {
-      character.classList.add('speaking');
-
-      // Scroll character into view smoothly
-      character.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-      character.classList.remove('speaking');
-    }
-  }
-}
-
-// Append chunk to personality response
-function appendPersonalityChunk(personality, chunk) {
-  const character = debateModal.querySelector(`.${personality}-character`);
-  if (character) {
-    const bubbleContent = character.querySelector('.bubble-content');
-    bubbleContent.textContent += chunk;
-
-    // Show bubble if first chunk
-    const bubble = character.querySelector('.speech-bubble');
-    if (!bubble.classList.contains('visible')) {
-      bubble.classList.add('visible');
-    }
-
-    // Auto-scroll
-    bubbleContent.scrollTop = bubbleContent.scrollHeight;
-  }
-}
-
-// Clear personality response
-function clearPersonalityResponse(personality) {
-  const character = debateModal.querySelector(`.${personality}-character`);
-  if (character) {
-    const bubbleContent = character.querySelector('.bubble-content');
-    bubbleContent.textContent = '';
-
-    const bubble = character.querySelector('.speech-bubble');
-    bubble.classList.remove('visible');
-  }
-}
-
-// Start the debate
+/**
+ * Start the debate
+ */
 function startDebate() {
   if (isDebateActive) return;
 
   isDebateActive = true;
   showDebateModal();
 
+  // Attach event handlers
+  attachCloseHandler(handleClose);
+  attachRemindHandler(handleRemindLater);
+  attachReconsiderHandler(handleReconsider);
+  attachProceedHandler(handleProceed);
+
   // Reset all personalities
-  ['enabler', 'skeptic', 'mediator'].forEach(p => {
+  [PERSONALITIES.ENABLER, PERSONALITIES.SKEPTIC, PERSONALITIES.MEDIATOR].forEach(p => {
     clearPersonalityResponse(p);
     updatePersonalityStatus(p, 'Waiting...');
   });
@@ -287,7 +87,7 @@ function startDebate() {
   // Extract context and send to background
   const productContext = extractProductContext();
 
-  // Extract and store current product info
+  // Store current product info
   currentProduct = {
     url: productContext.url,
     title: productContext.title,
@@ -298,67 +98,76 @@ function startDebate() {
   updatePriceDisplay(currentProduct.price);
 
   // Update savings display
-  updateSavingsDisplay();
+  const modal = getDebateModal();
+  updateSavingsDisplay(modal);
 
+  // Send message to background to start debate
   chrome.runtime.sendMessage({
-    type: 'generateDebateStreaming',
+    type: MESSAGE_TYPES.GENERATE_DEBATE_STREAMING,
     productContext: productContext.formatted
   });
 }
 
-// Listen for messages from background script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'personalityStart') {
-    updatePersonalityStatus(message.personality, 'Thinking...');
-  }
-
-  if (message.type === 'personalityChunk') {
-    appendPersonalityChunk(message.personality, message.chunk);
-    updatePersonalityStatus(message.personality, 'Responding...');
-  }
-
-  if (message.type === 'personalityComplete') {
-    updatePersonalityStatus(message.personality, 'Complete');
-  }
-
-  if (message.type === 'debateComplete') {
-    console.log('Debate complete!');
-  }
-
-  if (message.type === 'debateError') {
-    console.error('Debate error:', message.error);
-    showToast(`Error: ${message.error}`, 'error');
-    closeDebateModal();
-  }
-
-  if (message.type === 'triggerDebate') {
-    startDebate();
-  }
-});
-
-// Check if price meets threshold
+/**
+ * Check if price meets threshold
+ * @returns {Promise<boolean>}
+ */
 async function shouldTriggerDebate() {
-  const { priceThreshold = 50 } = await chrome.storage.sync.get(['priceThreshold']);
+  const priceThreshold = await getPriceThreshold() ?? DEFAULT_PRICE_THRESHOLD;
 
-  // Extract product context to get price
   const productContext = extractProductContext();
 
   if (productContext.prices.length === 0) {
-    // No price detected, trigger anyway
-    return true;
+    return true; // No price detected, trigger anyway
   }
 
-  // Get the first price and extract numeric value
   const priceString = productContext.prices[0];
   const priceValue = extractPriceValue(priceString);
 
-  // Trigger if price meets or exceeds threshold
   return priceValue >= priceThreshold;
 }
 
-// Auto-trigger on checkout pages with price threshold check
+/**
+ * Listen for messages from background script
+ */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  switch (message.type) {
+    case MESSAGE_TYPES.PERSONALITY_START:
+      updatePersonalityStatus(message.personality, 'Thinking...');
+      break;
+
+    case MESSAGE_TYPES.PERSONALITY_CHUNK:
+      appendPersonalityChunk(message.personality, message.chunk);
+      updatePersonalityStatus(message.personality, 'Responding...');
+      break;
+
+    case MESSAGE_TYPES.PERSONALITY_COMPLETE:
+      updatePersonalityStatus(message.personality, 'Complete');
+      break;
+
+    case MESSAGE_TYPES.DEBATE_COMPLETE:
+      console.log('Debate complete!');
+      break;
+
+    case MESSAGE_TYPES.DEBATE_ERROR:
+      console.error('Debate error:', message.error);
+      showToast(`Error: ${message.error}`, TOAST_TYPES.ERROR);
+      closeDebateModal();
+      break;
+
+    case MESSAGE_TYPES.TRIGGER_DEBATE:
+      startDebate();
+      break;
+
+    default:
+      break;
+  }
+});
+
+/**
+ * Auto-trigger on checkout pages with price threshold check
+ */
 if (isCheckoutPage()) {
-  // Wait for page to be fully loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
       if (await shouldTriggerDebate()) {

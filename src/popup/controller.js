@@ -1,15 +1,13 @@
 // Popup Controller
-console.log('[INFO] Shopping Debate popup loaded - API keys embedded from .env');
 
-const DEFAULT_MODELS = {
-  enabler: 'anthropic/claude-3-haiku',
-  skeptic: 'anthropic/claude-3.5-sonnet',
-  mediator: 'anthropic/claude-3-opus'
-};
+import { DEFAULT_MODELS, MESSAGE_TYPES } from '../shared/constants.js';
+import { getSyncStorage, setSyncStorage, getLocalStorage, setLocalStorage } from '../shared/storage.js';
+
+console.log('[INFO] Shopping Debate popup loaded - API keys embedded from .env');
 
 // Load current model selections
 async function loadModels() {
-  const result = await chrome.storage.sync.get(['models']);
+  const result = await getSyncStorage(['models']);
   const models = result.models || DEFAULT_MODELS;
 
   document.getElementById('quickModelEnabler').value = models.enabler;
@@ -25,7 +23,7 @@ async function saveModelChange() {
     mediator: document.getElementById('quickModelMediator').value
   };
 
-  await chrome.storage.sync.set({ models });
+  await setSyncStorage({ models });
   console.log('[INFO] Models updated:', models);
 }
 
@@ -48,7 +46,7 @@ document.getElementById('testDebate').addEventListener('click', async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   // Send message to content script to trigger debate
-  chrome.tabs.sendMessage(tab.id, { type: 'triggerDebate' });
+  chrome.tabs.sendMessage(tab.id, { type: MESSAGE_TYPES.TRIGGER_DEBATE });
 
   // Close popup
   window.close();
@@ -56,7 +54,7 @@ document.getElementById('testDebate').addEventListener('click', async () => {
 
 // Load and display reminders
 async function loadReminders() {
-  const { reminders = [] } = await chrome.storage.local.get(['reminders']);
+  const reminders = await getLocalStorage(['reminders']).then(result => result.reminders || []);
   const remindersList = document.getElementById('remindersList');
 
   if (reminders.length === 0) {
@@ -104,9 +102,9 @@ async function loadReminders() {
 
 // Delete a specific reminder
 async function deleteReminder(index) {
-  const { reminders = [] } = await chrome.storage.local.get(['reminders']);
+  const reminders = await getLocalStorage(['reminders']).then(result => result.reminders || []);
   reminders.splice(index, 1);
-  await chrome.storage.local.set({ reminders });
+  await setLocalStorage({ reminders });
   loadReminders(); // Reload the list
 }
 
