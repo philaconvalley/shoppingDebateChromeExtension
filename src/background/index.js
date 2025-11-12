@@ -264,4 +264,73 @@ URL: ${message.url || 'test-page'}`;
   }
 });
 
+// Set up alarm to check reminders every hour
+chrome.alarms.create('checkReminders', { periodInMinutes: 60 });
+
+// Check for due reminders
+async function checkDueReminders() {
+  const { reminders = [] } = await chrome.storage.local.get(['reminders']);
+  const now = Date.now();
+  const dueReminders = [];
+  const remainingReminders = [];
+
+  reminders.forEach(reminder => {
+    if (reminder.remindAt <= now) {
+      dueReminders.push(reminder);
+    } else {
+      remainingReminders.push(reminder);
+    }
+  });
+
+  // Send notifications for due reminders
+  for (const reminder of dueReminders) {
+    const price = reminder.product?.price || 'Price unknown';
+    const title = reminder.product?.title || 'Product';
+
+    chrome.notifications.create(reminder.url, {
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: 'Shopping Reminder',
+      message: `Remember this purchase?\n${title}\n${price}`,
+      buttons: [
+        { title: 'View Product' },
+        { title: 'Dismiss' }
+      ],
+      requireInteraction: true
+    });
+  }
+
+  // Update storage with only remaining reminders
+  if (dueReminders.length > 0) {
+    await chrome.storage.local.set({ reminders: remainingReminders });
+  }
+}
+
+// Listen for alarm
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'checkReminders') {
+    checkDueReminders();
+  }
+});
+
+// Handle notification clicks
+chrome.notifications.onClicked.addListener((notificationId) => {
+  // notificationId is the URL
+  chrome.tabs.create({ url: notificationId });
+  chrome.notifications.clear(notificationId);
+});
+
+// Handle notification button clicks
+chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+  if (buttonIndex === 0) {
+    // "View Product" button
+    chrome.tabs.create({ url: notificationId });
+  }
+  // Both buttons dismiss the notification
+  chrome.notifications.clear(notificationId);
+});
+
+// Check reminders immediately on startup
+checkDueReminders();
+
 console.log('Shopping Debate background service worker loaded');

@@ -144,6 +144,85 @@
       opacity: 1;
       text-decoration: underline;
     }
+
+    .reminders-section {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .reminders-section h3 {
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .reminder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .reminder-item {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .reminder-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .reminder-price {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .reminder-title {
+      opacity: 0.9;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .reminder-time {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .reminder-delete {
+      background: rgba(255, 71, 87, 0.8);
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .reminder-delete:hover {
+      background: rgba(255, 71, 87, 1);
+      transform: scale(1.05);
+    }
+
+    .no-reminders {
+      font-size: 12px;
+      opacity: 0.7;
+      text-align: center;
+      padding: 8px;
+    }
   </style>
 </head>
 <body>
@@ -153,6 +232,13 @@
   <div class="status">
     <span class="status-indicator"></span>
     Extension is active
+  </div>
+
+  <div class="reminders-section">
+    <h3>Pending Reminders</h3>
+    <div id="remindersList" class="reminder-list">
+      <div class="no-reminders">No reminders set</div>
+    </div>
   </div>
 
   <div class="model-quick-select">
