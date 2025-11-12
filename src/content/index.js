@@ -270,9 +270,22 @@ function startDebate() {
   // Extract context and send to background
   const productContext = extractProductContext();
 
+  // Extract and store current product info
+  currentProduct = {
+    url: productContext.url,
+    title: productContext.title,
+    price: productContext.prices?.[0] || 'Price not detected'
+  };
+
+  // Update price display
+  updatePriceDisplay(currentProduct.price);
+
+  // Update savings display
+  updateSavingsDisplay();
+
   chrome.runtime.sendMessage({
     type: 'generateDebateStreaming',
-    productContext: productContext
+    productContext: productContext.formatted
   });
 }
 
@@ -306,15 +319,41 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Auto-trigger on checkout pages
+// Check if price meets threshold
+async function shouldTriggerDebate() {
+  const { priceThreshold = 50 } = await chrome.storage.sync.get(['priceThreshold']);
+
+  // Extract product context to get price
+  const productContext = extractProductContext();
+
+  if (productContext.prices.length === 0) {
+    // No price detected, trigger anyway
+    return true;
+  }
+
+  // Get the first price and extract numeric value
+  const priceString = productContext.prices[0];
+  const priceValue = extractPriceValue(priceString);
+
+  // Trigger if price meets or exceeds threshold
+  return priceValue >= priceThreshold;
+}
+
+// Auto-trigger on checkout pages with price threshold check
 if (isCheckoutPage()) {
   // Wait for page to be fully loaded
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(startDebate, 1000);
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (await shouldTriggerDebate()) {
+        setTimeout(startDebate, 1000);
+      }
     });
   } else {
-    setTimeout(startDebate, 1000);
+    shouldTriggerDebate().then(shouldTrigger => {
+      if (shouldTrigger) {
+        setTimeout(startDebate, 1000);
+      }
+    });
   }
 }
 

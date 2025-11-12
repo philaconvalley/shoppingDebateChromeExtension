@@ -289,6 +289,161 @@
   background: #9ca3af;
 }
 
+/* Price Header */
+.debate-price-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  animation: priceAppear 0.4s ease-out both;
+}
+
+.price-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.price-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+@keyframes priceAppear {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Action Buttons */
+.debate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: actionsAppear 0.5s ease-out both;
+  animation-delay: 0.4s;
+}
+
+.action-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.remind-btn {
+  background: #f59e0b;
+  color: white;
+}
+
+.remind-btn:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.reconsider-btn {
+  background: #10b981;
+  color: white;
+}
+
+.reconsider-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.proceed-btn {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.proceed-btn:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+@keyframes actionsAppear {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Savings Tracker */
+.savings-tracker {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: savingsAppear 0.5s ease-out both;
+  animation-delay: 0.5s;
+}
+
+.savings-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.savings-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes savingsAppear {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   #shopping-debate-characters {
@@ -303,6 +458,19 @@
 
   .bubble-content {
     max-height: 120px;
+  }
+
+  .price-amount {
+    font-size: 18px;
+  }
+
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .stat-value {
+    font-size: 16px;
   }
 }
 
