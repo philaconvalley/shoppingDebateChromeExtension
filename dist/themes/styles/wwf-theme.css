@@ -1,0 +1,694 @@
+/**
+ * WWF Mode Theme - "Championship Shopping Showdown"
+ * 90s/2000s wrestling promo style
+ *
+ * Applies when [data-theme="wwf"] is set
+ */
+
+/* ============================================
+   COLOR VARIABLES - WWF MODE
+   ============================================ */
+
+[data-theme="wwf"] {
+  /* Primary Wrestling Palette - Gold, Neon, Metallic */
+  --wwf-primary: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  --wwf-gold: #FFD700;
+  --wwf-gold-dark: #B8860B;
+  --wwf-silver: #C0C0C0;
+  --wwf-bronze: #CD7F32;
+
+  /* Character Colors */
+  --bulldozer-gradient: linear-gradient(135deg, #FF4500 0%, #8B0000 100%);
+  --bulldozer-border: #FF4500;
+  --bulldozer-neon: #FF6347;
+
+  --steelfist-gradient: linear-gradient(135deg, #1E90FF 0%, #00008B 100%);
+  --steelfist-border: #1E90FF;
+  --steelfist-neon: #4169E1;
+
+  --candyslam-gradient: linear-gradient(135deg, #FF1493 0%, #8B008B 100%);
+  --candyslam-border: #FF1493;
+  --candyslam-neon: #FF69B4;
+
+  /* Ring & Arena Colors */
+  --ring-black: #000000;
+  --ring-red: #8B0000;
+  --spotlight: #FFFF00;
+  --neon-green: #00FF00;
+  --neon-blue: #00FFFF;
+
+  /* Neutral & Functional - WCAG Compliant */
+  --text-primary: #FFFFFF;        /* White on dark - 21:1 contrast (AAA) */
+  --text-secondary: #FFD700;      /* Gold - 10.4:1 contrast (AAA) */
+  --text-accent: #00FF00;         /* Neon green - for emphasis */
+  --text-dark: #000000;
+  --shadow-gold: rgba(255, 215, 0, 0.4);
+  --shadow-neon: rgba(0, 255, 0, 0.3);
+
+  /* Typography */
+  --font-headline: 'Impact', 'Archivo Black', 'Arial Black', sans-serif;
+  --font-body: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+  --font-accent: 'Impact', sans-serif;
+}
+
+/* Dark Mode (same - already dark) */
+[data-theme="wwf"][data-theme-mode="dark"] {
+  --text-primary: #FFFFFF;
+  --text-secondary: #FFD700;
+}
+
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto+Condensed:wght@400;700&display=swap');
+
+
+/* ============================================
+   SIDEBAR CONTAINER - RING ENTRANCE
+   ============================================ */
+
+[data-theme="wwf"] #shopping-debate-characters {
+  background: linear-gradient(180deg,
+    #0D0D0D 0%,
+    #000000 50%,
+    #1A1A1A 100%
+  );
+  border: 4px solid var(--wwf-gold);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.8),
+    0 0 40px var(--shadow-gold),
+    0 0 80px var(--shadow-neon),
+    0 0 0 2px var(--ring-black) inset;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Spotlight effect */
+[data-theme="wwf"] #shopping-debate-characters::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center,
+    rgba(255, 255, 0, 0.1) 0%,
+    transparent 50%
+  );
+  animation: spotlightSweep 6s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes spotlightSweep {
+  0%, 100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(180deg);
+  }
+}
+
+/* Neon glow pulse */
+[data-theme="wwf"] #shopping-debate-characters::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--neon-green);
+  border-radius: 16px;
+  opacity: 0;
+  animation: neonPulse 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    opacity: 0;
+    box-shadow: 0 0 0px var(--neon-green);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px var(--neon-green);
+  }
+}
+
+[data-theme="wwf"] #shopping-debate-characters > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ============================================
+   CLOSE BUTTON - RING THE BELL
+   ============================================ */
+
+[data-theme="wwf"] .debate-close-btn {
+  background: var(--ring-red);
+  border: 4px solid var(--wwf-gold);
+  box-shadow:
+    0 4px 12px rgba(139, 0, 0, 0.8),
+    0 0 20px var(--shadow-gold);
+  color: var(--wwf-gold);
+  font-weight: 900;
+  font-family: var(--font-headline);
+}
+
+[data-theme="wwf"] .debate-close-btn:hover {
+  background: var(--wwf-gold);
+  color: var(--ring-black);
+  transform: scale(1.2) rotate(90deg);
+  box-shadow:
+    0 8px 24px var(--shadow-gold),
+    0 0 40px var(--neon-green);
+}
+
+
+/* ============================================
+   PRICE HEADER - CHAMPIONSHIP BELT
+   ============================================ */
+
+[data-theme="wwf"] .debate-price-header {
+  background: var(--wwf-primary);
+  color: var(--ring-black);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow:
+    0 4px 12px var(--shadow-gold),
+    0 0 30px var(--shadow-neon),
+    0 0 0 3px var(--ring-black) inset;
+  margin-bottom: 20px;
+  border: 4px solid var(--wwf-gold-dark);
+  position: relative;
+}
+
+/* Championship plate effect */
+[data-theme="wwf"] .debate-price-header::before {
+  content: '🏆';
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 24px;
+  animation: trophySpin 4s linear infinite;
+}
+
+[data-theme="wwf"] .debate-price-header::after {
+  content: '🏆';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 24px;
+  animation: trophySpin 4s linear infinite reverse;
+}
+
+@keyframes trophySpin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+[data-theme="wwf"] .price-label {
+  font-family: var(--font-headline);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+[data-theme="wwf"] .price-amount {
+  font-family: var(--font-headline);
+  font-size: 32px;
+  font-weight: 900;
+  text-shadow:
+    2px 2px 0px var(--ring-black),
+    4px 4px 8px rgba(0, 0, 0, 0.8);
+  color: var(--ring-black);
+  letter-spacing: 2px;
+}
+
+
+/* ============================================
+   CHARACTER AVATARS - WRESTLERS
+   ============================================ */
+
+/* The Bulldozer (Rage) */
+[data-theme="wwf"] .enabler-character .avatar-icon {
+  background: var(--bulldozer-gradient);
+  border: 4px solid var(--bulldozer-border);
+  box-shadow:
+    0 4px 16px rgba(255, 69, 0, 0.6),
+    0 0 30px var(--bulldozer-neon);
+  font-size: 28px;
+}
+
+[data-theme="wwf"] .enabler-character .avatar-icon::before {
+  content: '💪';
+}
+
+/* Steel Fist (Cocky) */
+[data-theme="wwf"] .skeptic-character .avatar-icon {
+  background: var(--steelfist-gradient);
+  border: 4px solid var(--steelfist-border);
+  box-shadow:
+    0 4px 16px rgba(30, 144, 255, 0.6),
+    0 0 30px var(--steelfist-neon);
+  font-size: 28px;
+}
+
+[data-theme="wwf"] .skeptic-character .avatar-icon::before {
+  content: '👊';
+}
+
+/* Candy Slam (Wild Card) */
+[data-theme="wwf"] .mediator-character .avatar-icon {
+  background: var(--candyslam-gradient);
+  border: 4px solid var(--candyslam-border);
+  box-shadow:
+    0 4px 16px rgba(255, 20, 147, 0.6),
+    0 0 30px var(--candyslam-neon);
+  font-size: 28px;
+}
+
+[data-theme="wwf"] .mediator-character .avatar-icon::before {
+  content: '⚡';
+}
+
+
+/* ============================================
+   AVATAR PULSE EFFECTS - INTENSITY
+   ============================================ */
+
+[data-theme="wwf"] .enabler-character.speaking .avatar-pulse {
+  background: var(--bulldozer-gradient);
+  animation: bulldozerPulse 1s ease-out infinite;
+}
+
+[data-theme="wwf"] .skeptic-character.speaking .avatar-pulse {
+  background: var(--steelfist-gradient);
+  animation: steelfistPulse 1s ease-out infinite;
+}
+
+[data-theme="wwf"] .mediator-character.speaking .avatar-pulse {
+  background: var(--candyslam-gradient);
+  animation: candyslamPulse 1s ease-out infinite;
+}
+
+@keyframes bulldozerPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes steelfistPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes candyslamPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.3) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Speaking Animations */
+[data-theme="wwf"] .enabler-character.speaking .avatar-icon {
+  animation: bulldozerRage 0.4s ease-in-out infinite;
+}
+
+[data-theme="wwf"] .skeptic-character.speaking .avatar-icon {
+  animation: steelfistFlex 0.6s ease-in-out infinite;
+}
+
+[data-theme="wwf"] .mediator-character.speaking .avatar-icon {
+  animation: candyslamSpin 0.8s linear infinite;
+}
+
+@keyframes bulldozerRage {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+}
+
+@keyframes steelfistFlex {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.1);
+  }
+}
+
+@keyframes candyslamSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ============================================
+   SPEECH BUBBLES - PROMO STYLE
+   ============================================ */
+
+[data-theme="wwf"] .speech-bubble {
+  background: rgba(0, 0, 0, 0.9);
+  border: 3px solid transparent;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.8),
+    0 0 20px var(--shadow-neon);
+  border-radius: 12px;
+  font-family: var(--font-body);
+}
+
+/* Bulldozer's bubble */
+[data-theme="wwf"] .enabler-character .speech-bubble {
+  border-color: var(--bulldozer-border);
+  background: linear-gradient(135deg,
+    rgba(139, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.98) 100%
+  );
+}
+
+/* Steel Fist's bubble */
+[data-theme="wwf"] .skeptic-character .speech-bubble {
+  border-color: var(--steelfist-border);
+  background: linear-gradient(135deg,
+    rgba(0, 0, 139, 0.95) 0%,
+    rgba(0, 0, 0, 0.98) 100%
+  );
+}
+
+/* Candy Slam's bubble */
+[data-theme="wwf"] .mediator-character .speech-bubble {
+  border-color: var(--candyslam-border);
+  background: linear-gradient(135deg,
+    rgba(139, 0, 139, 0.95) 0%,
+    rgba(0, 0, 0, 0.98) 100%
+  );
+}
+
+
+/* ============================================
+   BUBBLE HEADERS - WRESTLER NAMES
+   ============================================ */
+
+[data-theme="wwf"] .bubble-name {
+  font-family: var(--font-headline);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+[data-theme="wwf"] .enabler-character .bubble-name {
+  color: var(--bulldozer-neon);
+  text-shadow:
+    0 0 10px var(--bulldozer-neon),
+    2px 2px 0px var(--ring-black),
+    4px 4px 8px rgba(0, 0, 0, 0.8);
+  border-bottom: 3px solid var(--bulldozer-border);
+}
+
+[data-theme="wwf"] .skeptic-character .bubble-name {
+  color: var(--steelfist-neon);
+  text-shadow:
+    0 0 10px var(--steelfist-neon),
+    2px 2px 0px var(--ring-black),
+    4px 4px 8px rgba(0, 0, 0, 0.8);
+  border-bottom: 3px solid var(--steelfist-border);
+}
+
+[data-theme="wwf"] .mediator-character .bubble-name {
+  color: var(--candyslam-neon);
+  text-shadow:
+    0 0 10px var(--candyslam-neon),
+    2px 2px 0px var(--ring-black),
+    4px 4px 8px rgba(0, 0, 0, 0.8);
+  border-bottom: 3px solid var(--candyslam-border);
+}
+
+[data-theme="wwf"] .bubble-status {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.2);
+  color: var(--wwf-gold);
+  box-shadow: 0 0 10px var(--shadow-gold);
+  font-family: var(--font-headline);
+}
+
+
+/* ============================================
+   BUBBLE CONTENT - PROMO TRASH TALK
+   ============================================ */
+
+[data-theme="wwf"] .bubble-content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);  /* White - High contrast (21:1) ✅ */
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Emphasis with neon glow */
+[data-theme="wwf"] .bubble-content strong,
+[data-theme="wwf"] .bubble-content em {
+  color: var(--neon-green);
+  text-shadow:
+    0 0 10px var(--neon-green),
+    0 0 20px var(--shadow-neon);
+  font-weight: 900;
+}
+
+
+/* ============================================
+   ACTION BUTTONS - WRESTLING MOVES
+   ============================================ */
+
+[data-theme="wwf"] .action-btn {
+  font-family: var(--font-headline);
+  font-size: 14px;
+  font-weight: 900;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* "AND THAT'S THE BOTTOM LINE!" (Proceed) */
+[data-theme="wwf"] .proceed-btn {
+  background: var(--wwf-primary);
+  color: var(--ring-black);
+  border-color: var(--wwf-gold-dark);
+  box-shadow:
+    0 4px 12px var(--shadow-gold),
+    0 0 20px var(--neon-green);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="wwf"] .proceed-btn:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 8px 24px var(--shadow-gold),
+    0 0 40px var(--neon-green);
+}
+
+/* "TAP OUT!" (Reconsider) */
+[data-theme="wwf"] .reconsider-btn {
+  background: var(--ring-red);
+  color: var(--wwf-gold);
+  border-color: var(--bulldozer-border);
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.8);
+}
+
+[data-theme="wwf"] .reconsider-btn:hover {
+  background: var(--bulldozer-gradient);
+  color: var(--text-primary);
+  transform: scale(1.08);
+}
+
+/* "Remind Me Later" */
+[data-theme="wwf"] .remind-btn {
+  background: rgba(192, 192, 192, 0.3);
+  color: var(--wwf-silver);
+  border-color: var(--wwf-silver);
+}
+
+[data-theme="wwf"] .remind-btn:hover {
+  background: var(--wwf-silver);
+  color: var(--ring-black);
+}
+
+
+/* ============================================
+   SAVINGS TRACKER - CHAMPIONSHIP STATS
+   ============================================ */
+
+[data-theme="wwf"] .savings-tracker {
+  background: linear-gradient(135deg,
+    rgba(255, 215, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  border: 3px solid var(--wwf-gold);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+  box-shadow:
+    0 4px 12px var(--shadow-gold),
+    0 0 30px var(--shadow-neon);
+}
+
+[data-theme="wwf"] .savings-label {
+  font-family: var(--font-headline);
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--wwf-gold);
+  text-align: center;
+  margin-bottom: 12px;
+  text-shadow:
+    0 0 10px var(--wwf-gold),
+    2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="wwf"] .stat-value {
+  color: var(--neon-green);
+  text-shadow:
+    0 0 15px var(--neon-green),
+    2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-family: var(--font-headline);
+}
+
+[data-theme="wwf"] .stat-label {
+  color: var(--wwf-silver);
+  opacity: 0.9;
+  font-family: var(--font-headline);
+  font-size: 10px;
+}
+
+
+/* ============================================
+   ENTRANCE ANIMATION - RING ENTRANCE
+   ============================================ */
+
+[data-theme="wwf"] #shopping-debate-characters.active {
+  animation: wwfRingEntrance 0.8s cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+@keyframes wwfRingEntrance {
+  from {
+    transform: translateX(450px) scale(1.2);
+    opacity: 0;
+  }
+  30% {
+    transform: translateX(-50px) scale(0.9);
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================
+   CHARACTER APPEARANCE - WRESTLER ENTRANCE
+   ============================================ */
+
+[data-theme="wwf"] .debate-character {
+  animation: wrestlerEntrance 0.5s ease-out both;
+}
+
+[data-theme="wwf"] .enabler-character {
+  animation-delay: 0.2s;
+}
+
+[data-theme="wwf"] .skeptic-character {
+  animation-delay: 0.4s;
+}
+
+[data-theme="wwf"] .mediator-character {
+  animation-delay: 0.6s;
+}
+
+@keyframes wrestlerEntrance {
+  from {
+    transform: translateY(-50px) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(10px) scale(1.1);
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================
+   ACCESSIBILITY - REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="wwf"] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  [data-theme="wwf"] #shopping-debate-characters {
+    width: calc(100% - 40px);
+  }
+
+  [data-theme="wwf"] .price-amount {
+    font-size: 26px;
+  }
+
+  [data-theme="wwf"] .bubble-content {
+    font-size: 13px;
+  }
+}

@@ -144,11 +144,219 @@
       opacity: 1;
       text-decoration: underline;
     }
+
+    /* Theme Toggle Styles - PROMINENT */
+    .theme-toggle {
+      background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.15) 100%);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .theme-toggle h3 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .theme-btn {
+      padding: 12px 16px;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      transition: left 0.5s;
+    }
+
+    .theme-btn:hover::before {
+      left: 100%;
+    }
+
+    .theme-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-btn.active {
+      background: white;
+      color: #667eea;
+      border-color: white;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn.active.regina-theme {
+      background: linear-gradient(135deg, #FFB6D9 0%, #FF69B4 100%);
+      color: white;
+      border-color: #FFD700;
+      box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+      animation: reginaPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes reginaPulse {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+      }
+      50% {
+        box-shadow: 0 8px 24px rgba(255, 215, 0, 0.6);
+      }
+    }
+
+    .theme-btn.active.regina-theme::after {
+      content: '✨';
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      animation: sparkle 1.5s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+      }
+      50% {
+        opacity: 0.5;
+        transform: translateY(-50%) scale(1.2);
+      }
+    }
+
+    .theme-btn.active.telenovela-theme {
+      background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+      color: white;
+      border-color: #DAA520;
+      box-shadow: 0 6px 20px rgba(220, 20, 60, 0.5);
+      animation: telenovelaPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes telenovelaPulse {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(220, 20, 60, 0.5);
+      }
+      50% {
+        box-shadow: 0 8px 24px rgba(218, 165, 32, 0.6);
+      }
+    }
+
+    .theme-btn.active.telenovela-theme::after {
+      content: '🌹';
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      animation: rose 1.5s ease-in-out infinite;
+    }
+
+    @keyframes rose {
+      0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: translateY(-50%) scale(1.1);
+      }
+    }
+
+    .theme-btn.active.wwf-theme {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      color: #000000;
+      border-color: #00FF00;
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.7);
+      animation: wwfPulse 1.5s ease-in-out infinite;
+      font-weight: 900;
+    }
+
+    @keyframes wwfPulse {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.7);
+      }
+      50% {
+        box-shadow: 0 8px 24px rgba(0, 255, 0, 0.6);
+      }
+    }
+
+    .theme-btn.active.wwf-theme::after {
+      content: '🏆';
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      animation: championship 1s ease-in-out infinite;
+    }
+
+    @keyframes championship {
+      0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1) rotate(0deg);
+      }
+      50% {
+        opacity: 0.8;
+        transform: translateY(-50%) scale(1.2) rotate(10deg);
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Shopping Debate</h1>
   <p class="subtitle">AI personalities debate your purchases</p>
+
+  <div class="theme-toggle">
+    <h3>🎭 CHOOSE YOUR DRAMA MODE</h3>
+    <div class="theme-options">
+      <button class="theme-btn" data-theme="default" id="theme-default">
+        Default
+      </button>
+      <button class="theme-btn regina-theme" data-theme="regina" id="theme-regina">
+        👑 Regina
+      </button>
+      <button class="theme-btn telenovela-theme" data-theme="telenovela" id="theme-telenovela">
+        💔 Telenovela
+      </button>
+      <button class="theme-btn wwf-theme" data-theme="wwf" id="theme-wwf">
+        💪 WWF
+      </button>
+    </div>
+  </div>
 
   <div class="status">
     <span class="status-indicator"></span>

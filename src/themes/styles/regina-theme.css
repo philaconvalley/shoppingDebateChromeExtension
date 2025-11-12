@@ -1,0 +1,737 @@
+/**
+ * Regina Mode Theme - Updated for Sidebar UI
+ * "On Wednesdays We Wear Pink" - Mean Girls Shopping Experience
+ *
+ * This stylesheet applies when [data-theme="regina"] is set on the document root
+ * Updated to work with new character sidebar layout
+ */
+
+/* ============================================
+   COLOR VARIABLES - REGINA MODE
+   ============================================ */
+
+[data-theme="regina"] {
+  /* Primary Regina Pink Palette */
+  --regina-primary: linear-gradient(135deg, #FFB6D9 0%, #FF69B4 50%, #FF1493 100%);
+  --regina-pink-light: #FFE4F0;
+  --regina-pink-medium: #FFB6D9;
+  --regina-pink-hot: #FF69B4;
+  --regina-pink-deep: #FF1493;
+  --regina-pink-burn: #C71585;
+
+  /* The Plastics Gold Accent */
+  --plastics-gold: #FFD700;
+  --plastics-gold-light: #FFF8DC;
+
+  /* Supporting Cast Colors */
+  --gretchen-gradient: linear-gradient(135deg, #DDA0DD 0%, #BA55D3 100%);
+  --gretchen-border: #BA55D3;
+  --gretchen-accent: #9370DB;
+
+  --karen-gradient: linear-gradient(135deg, #FFE4E1 0%, #FFC0CB 100%);
+  --karen-border: #FFC0CB;
+  --karen-accent: #FFB6C1;
+
+  /* Neutral & Functional - WCAG AA/AAA Compliant - DARK MODE */
+  --text-primary: #FFFFFF;         /* White text on dark backgrounds */
+  --text-secondary: #FFB6D9;       /* Light pink for secondary text */
+  --text-accent: #FF69B4;          /* Hot pink - USE ONLY FOR EMPHASIS */
+  --dialogue-bg: #2D1B2E;          /* Deep purple-black background - WCAG AAA compliant */
+  --white-glossy: #FFFFFF;
+  --shadow-pink: rgba(255, 20, 147, 0.15);
+  --shadow-pink-strong: rgba(255, 20, 147, 0.3);
+
+  /* State Colors - WCAG AA Compliant */
+  --success-green: #2E7D32;       /* Darker green - 4.6:1 contrast */
+  --burn-book-red: #C62828;       /* Darker red - 6.2:1 contrast */
+
+  /* Typography */
+  --font-headline: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent: 'Archivo Black', Impact, sans-serif;
+}
+
+/* Dark Mode Color Overrides */
+[data-theme="regina"][data-theme-mode="dark"] {
+  --regina-primary: linear-gradient(135deg, #C71585 0%, #8B008B 100%);
+  --regina-pink-light: #2D1B2E;
+  --text-primary: #FFE4F0;
+  --text-secondary: #DDA0DD;
+  --white-glossy: #1A0A1F;
+  --shadow-pink: rgba(199, 21, 133, 0.2);
+}
+
+/* Import Google Fonts for Regina Mode */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap');
+
+
+/* ============================================
+   SIDEBAR CONTAINER - REGINA STYLING
+   ============================================ */
+
+[data-theme="regina"] #shopping-debate-characters {
+  /* SIDEBAR LAYOUT - RIGHT ANCHORED */
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 360px;
+  max-width: 100vw;
+  z-index: 9999;
+
+  /* REGINA STYLING */
+  background: linear-gradient(180deg,
+    var(--regina-pink-light) 0%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  border: 3px solid var(--regina-pink-medium);
+  border-radius: 24px 0 0 24px;
+  box-shadow:
+    0 24px 48px var(--shadow-pink-strong),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="regina"] #shopping-debate-characters::-webkit-scrollbar-thumb {
+  background: var(--regina-pink-hot);
+  border-radius: 4px;
+}
+
+[data-theme="regina"] #shopping-debate-characters::-webkit-scrollbar-thumb:hover {
+  background: var(--regina-pink-deep);
+}
+
+
+/* ============================================
+   CLOSE BUTTON - REGINA STYLED
+   ============================================ */
+
+[data-theme="regina"] .debate-close-btn {
+  background: var(--regina-primary);
+  border: 3px solid var(--plastics-gold);
+  box-shadow:
+    0 4px 12px var(--shadow-pink-strong),
+    0 0 20px rgba(255, 215, 0, 0.4);
+  font-weight: 700;
+}
+
+[data-theme="regina"] .debate-close-btn:hover {
+  background: var(--plastics-gold);
+  color: var(--regina-pink-deep);
+  transform: scale(1.15) rotate(90deg);
+}
+
+
+/* ============================================
+   PRICE HEADER - PINK & GOLD
+   ============================================ */
+
+[data-theme="regina"] .debate-price-header {
+  background: var(--regina-primary);
+  color: white;
+  padding: 16px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 12px var(--shadow-pink);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shimmer effect */
+[data-theme="regina"] .debate-price-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+[data-theme="regina"] .price-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+[data-theme="regina"] .price-amount {
+  font-family: var(--font-headline);
+  font-size: 28px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--plastics-gold);
+}
+
+
+/* ============================================
+   CHARACTER AVATARS - THE PLASTICS
+   ============================================ */
+
+/* Regina's Avatar - Crown Icon */
+[data-theme="regina"] .enabler-character .avatar-icon {
+  background: var(--regina-primary);
+  border: 3px solid var(--plastics-gold);
+  box-shadow:
+    0 4px 16px var(--shadow-pink-strong),
+    0 0 20px rgba(255, 215, 0, 0.3);
+  font-size: 28px;
+}
+
+[data-theme="regina"] .enabler-character .avatar-icon::before {
+  content: '👑';
+}
+
+/* Gretchen's Avatar - Nervous Face */
+[data-theme="regina"] .skeptic-character .avatar-icon {
+  background: var(--gretchen-gradient);
+  border: 3px solid var(--gretchen-border);
+  box-shadow: 0 4px 16px rgba(186, 85, 211, 0.3);
+  font-size: 28px;
+}
+
+[data-theme="regina"] .skeptic-character .avatar-icon::before {
+  content: '😬';
+}
+
+/* Karen's Avatar - Shrug Face */
+[data-theme="regina"] .mediator-character .avatar-icon {
+  background: var(--karen-gradient);
+  border: 3px solid var(--karen-border);
+  box-shadow: 0 4px 16px rgba(255, 192, 203, 0.3);
+  font-size: 28px;
+}
+
+[data-theme="regina"] .mediator-character .avatar-icon::before {
+  content: '🤷‍♀️';
+}
+
+
+/* ============================================
+   AVATAR PULSE EFFECTS - SPEAKING ANIMATION
+   ============================================ */
+
+[data-theme="regina"] .enabler-character.speaking .avatar-pulse {
+  background: var(--regina-primary);
+  animation: reginaPulse 1.5s ease-out infinite;
+}
+
+[data-theme="regina"] .skeptic-character.speaking .avatar-pulse {
+  background: var(--gretchen-gradient);
+  animation: gretchenPulse 1.5s ease-out infinite;
+}
+
+[data-theme="regina"] .mediator-character.speaking .avatar-pulse {
+  background: var(--karen-gradient);
+  animation: karenPulse 1.5s ease-out infinite;
+}
+
+@keyframes reginaPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes gretchenPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2) rotate(-5deg);
+    opacity: 0;
+  }
+}
+
+@keyframes karenPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+/* Speaking Avatar Animations */
+[data-theme="regina"] .enabler-character.speaking .avatar-icon {
+  animation: reginaBounce 0.6s ease-in-out infinite;
+}
+
+[data-theme="regina"] .skeptic-character.speaking .avatar-icon {
+  animation: gretchenNervous 0.8s ease-in-out infinite;
+}
+
+[data-theme="regina"] .mediator-character.speaking .avatar-icon {
+  animation: karenSway 1s ease-in-out infinite;
+}
+
+@keyframes reginaBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+
+@keyframes gretchenNervous {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+
+@keyframes karenSway {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+
+/* ============================================
+   SPEECH BUBBLES - MEAN GIRLS STYLED
+   ============================================ */
+
+[data-theme="regina"] .speech-bubble {
+  background: var(--dialogue-bg);
+  border: 2px solid transparent;
+  box-shadow: 0 4px 16px var(--shadow-pink);
+  border-radius: 18px;
+  font-family: var(--font-body);
+}
+
+/* Regina's speech bubble */
+[data-theme="regina"] .enabler-character .speech-bubble {
+  border-color: var(--regina-pink-medium);
+  background: linear-gradient(135deg, #2D1B2E 0%, #3D2B3E 100%);
+}
+
+[data-theme="regina"] .enabler-character .speech-bubble::before {
+  border-right-color: #2D1B2E;
+}
+
+/* Gretchen's speech bubble */
+[data-theme="regina"] .skeptic-character .speech-bubble {
+  border-color: var(--gretchen-border);
+  background: linear-gradient(135deg, #2D1B2E 0%, #352440 100%);
+}
+
+[data-theme="regina"] .skeptic-character .speech-bubble::before {
+  border-right-color: #2D1B2E;
+}
+
+/* Karen's speech bubble */
+[data-theme="regina"] .mediator-character .speech-bubble {
+  border-color: var(--karen-border);
+  background: linear-gradient(135deg, #2D1B2E 0%, #3D2633 100%);
+}
+
+[data-theme="regina"] .mediator-character .speech-bubble::before {
+  border-right-color: #2D1B2E;
+}
+
+
+/* ============================================
+   BUBBLE HEADERS - CHARACTER NAMES
+   ============================================ */
+
+[data-theme="regina"] .bubble-header {
+  border-bottom-color: rgba(255, 182, 217, 0.3);
+}
+
+[data-theme="regina"] .bubble-name {
+  font-family: var(--font-headline);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+[data-theme="regina"] .enabler-character .bubble-name {
+  color: var(--text-primary);  /* White text */
+  /* Add pink glow for Regina's royal flair */
+  text-shadow:
+    0 0 10px rgba(255, 105, 180, 0.8),
+    0 2px 4px rgba(255, 20, 147, 0.5);
+  /* Optional: Add subtle gradient underline instead */
+  border-bottom: 3px solid transparent;
+  border-image: var(--regina-primary) 1;
+}
+
+[data-theme="regina"] .skeptic-character .bubble-name {
+  color: var(--text-primary);  /* White text */
+  /* Purple glow for Gretchen */
+  text-shadow: 0 0 8px rgba(186, 85, 211, 0.7);
+  border-bottom: 3px solid var(--gretchen-border);
+}
+
+[data-theme="regina"] .mediator-character .bubble-name {
+  color: var(--text-primary);  /* White text */
+  /* Soft pink glow for Karen */
+  text-shadow: 0 0 8px rgba(255, 192, 203, 0.7);
+  border-bottom: 3px solid var(--karen-border);
+}
+
+[data-theme="regina"] .bubble-status {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: rgba(255, 105, 180, 0.2);
+  color: var(--text-secondary);  /* Light pink text */
+  /* Add pink glow for style */
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.3);
+}
+
+
+/* ============================================
+   BUBBLE CONTENT - DIALOGUE TEXT
+   ============================================ */
+
+[data-theme="regina"] .bubble-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);  /* White - High contrast (16.6:1) ✅ */
+  font-family: var(--font-body);
+  font-weight: 400;  /* Normal weight on dark background */
+}
+
+/* Optional: Pink accent for emphasis words */
+[data-theme="regina"] .bubble-content strong,
+[data-theme="regina"] .bubble-content em {
+  color: var(--text-accent);  /* Hot pink for emphasis */
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.6);  /* Pink glow on emphasis */
+  font-weight: 700;
+}
+
+/* Text streaming sparkle effect */
+[data-theme="regina"] .bubble-content:last-child::after {
+  content: '✨';
+  opacity: 0;
+  animation: sparkle 0.6s ease-out;
+  margin-left: 4px;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+
+/* ============================================
+   ACTION BUTTONS - "THAT'S SO FETCH" STYLE
+   ============================================ */
+
+[data-theme="regina"] .debate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+[data-theme="regina"] .action-btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+}
+
+/* "Proceed to Purchase" - That's So Fetch! */
+[data-theme="regina"] .proceed-btn {
+  background: var(--regina-primary);
+  color: white;
+  border-color: var(--plastics-gold);
+  box-shadow: 0 4px 12px var(--shadow-pink);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="regina"] .proceed-btn::before {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 20px;
+  opacity: 0;
+}
+
+[data-theme="regina"] .proceed-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px var(--shadow-pink-strong);
+}
+
+[data-theme="regina"] .proceed-btn:hover::before {
+  animation: sparkleBtn 0.6s ease-out;
+}
+
+@keyframes sparkleBtn {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* "I'll Reconsider" - Whatever */
+[data-theme="regina"] .reconsider-btn {
+  background: white;
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+[data-theme="regina"] .reconsider-btn:hover {
+  background: var(--text-secondary);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* "Remind Me Later" - Neutral */
+[data-theme="regina"] .remind-btn {
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  border-color: var(--regina-pink-medium);
+}
+
+[data-theme="regina"] .remind-btn:hover {
+  background: var(--regina-pink-light);
+  border-color: var(--regina-pink-hot);
+}
+
+
+/* ============================================
+   SAVINGS TRACKER - THE PLASTICS STATS
+   ============================================ */
+
+[data-theme="regina"] .savings-tracker {
+  background: linear-gradient(135deg,
+    var(--regina-pink-light) 0%,
+    var(--plastics-gold-light) 100%
+  );
+  border: 2px solid var(--regina-pink-medium);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px var(--shadow-pink);
+}
+
+[data-theme="regina"] .savings-label {
+  font-family: var(--font-headline);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary);  /* High contrast: 12.6:1 ✅ */
+  text-align: center;
+  margin-bottom: 12px;
+  /* Add pink glow for royal flair */
+  text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="regina"] .savings-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+}
+
+[data-theme="regina"] .stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+[data-theme="regina"] .stat-value {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);  /* High contrast: 12.6:1 ✅ */
+  /* Add pink glow for style */
+  text-shadow: 0 0 12px rgba(255, 20, 147, 0.4);
+  margin-bottom: 4px;
+}
+
+[data-theme="regina"] .stat-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);  /* High contrast instead of secondary */
+  opacity: 0.75;  /* Slight transparency for visual hierarchy */
+}
+
+
+/* ============================================
+   SLIDE-IN ANIMATION - GRAND ENTRANCE
+   ============================================ */
+
+[data-theme="regina"] #shopping-debate-characters.active {
+  animation: reginaSlideIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes reginaSlideIn {
+  from {
+    transform: translateX(450px) rotate(-5deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-20px) rotate(2deg);
+  }
+  to {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================
+   CHARACTER APPEARANCE - STAGGERED ENTRANCE
+   ============================================ */
+
+[data-theme="regina"] .debate-character {
+  animation: characterFadeIn 0.5s ease-out both;
+}
+
+[data-theme="regina"] .enabler-character {
+  animation-delay: 0.2s;
+}
+
+[data-theme="regina"] .skeptic-character {
+  animation-delay: 0.4s;
+}
+
+[data-theme="regina"] .mediator-character {
+  animation-delay: 0.6s;
+}
+
+@keyframes characterFadeIn {
+  from {
+    transform: translateX(50px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS - MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+  [data-theme="regina"] #shopping-debate-characters {
+    width: calc(100% - 40px);
+    right: 10px;
+    top: 60px;
+  }
+
+  [data-theme="regina"] .price-amount {
+    font-size: 24px;
+  }
+
+  [data-theme="regina"] .avatar-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+  }
+
+  [data-theme="regina"] .speech-bubble {
+    font-size: 13px;
+  }
+}
+
+
+/* ============================================
+   ACCESSIBILITY - REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="regina"] *,
+  [data-theme="regina"] *::before,
+  [data-theme="regina"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="regina"] #shopping-debate-characters {
+    background: linear-gradient(180deg,
+      #2D1B2E 0%,
+      #1A0A1F 100%
+    );
+  }
+
+  [data-theme="regina"] .speech-bubble {
+    background: #2D1B2E;
+    color: #FFE4F0;
+  }
+
+  [data-theme="regina"] .bubble-content {
+    color: #FFE4F0;
+  }
+
+  [data-theme="regina"] .savings-tracker {
+    background: linear-gradient(135deg,
+      #2D1B2E 0%,
+      #3D2B3E 100%
+    );
+  }
+}

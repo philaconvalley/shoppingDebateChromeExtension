@@ -65,6 +65,7 @@ module.exports = (env, argv) => {
           { from: 'src/popup', to: 'popup' },
           { from: 'src/options', to: 'options' },
           { from: 'src/content/*.css', to: 'content/[name][ext]', noErrorOnMissing: true },
+          { from: 'src/themes/styles', to: 'themes/styles', noErrorOnMissing: true },
           { from: 'icons', to: 'icons', noErrorOnMissing: true }
         ]
       })

@@ -2,18 +2,18 @@
 
 #shopping-debate-characters {
   position: fixed;
-  top: 80px;
-  right: 20px;
-  width: 400px;
-  max-height: calc(100vh - 100px);
-  z-index: 2147483647;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 360px;
+  z-index: 9999;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: none;
   flex-direction: column;
-  gap: 20px;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 10px;
+  padding: 20px;
+  background: var(--dialogue-bg);
+  color: var(--dialogue-text);
 }
 
 #shopping-debate-characters::-webkit-scrollbar {
@@ -500,4 +500,12 @@
   .bubble-content {
     font-size: 12px;
   }
+}
+
+.dialogue-box {
+  background-color: var(--dialogue-bg);
+  color: var(--dialogue-text);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }

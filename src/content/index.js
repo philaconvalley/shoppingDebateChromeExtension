@@ -1,13 +1,21 @@
 // Content Script - Debate Modal and Message Handling
 import { isCheckoutPage, extractProductContext } from './checkout.js';
+import { initializeTheme, getCharacterConfig, getCurrentTheme, THEMES, getThemeConfig } from '../themes/theme-switcher.js';
 
 let debateModal = null;
 let isDebateActive = false;
 let currentProduct = null; // Store current product for reminders/tracking
+let currentTheme = THEMES.DEFAULT;
 
-// Create the debate character UI
-function createDebateModal() {
+// Create the debate character UI (theme-aware)
+async function createDebateModal() {
   if (debateModal) return debateModal;
+
+  // Get current theme and character config
+  currentTheme = await getCurrentTheme();
+  const enablerChar = getCharacterConfig(currentTheme, 'enabler');
+  const skepticChar = getCharacterConfig(currentTheme, 'skeptic');
+  const mediatorChar = getCharacterConfig(currentTheme, 'mediator');
 
   const modal = document.createElement('div');
   modal.id = 'shopping-debate-characters';
@@ -21,12 +29,12 @@ function createDebateModal() {
     <!-- Enabler Character -->
     <div class="debate-character enabler-character">
       <div class="character-avatar">
-        <div class="avatar-icon">+</div>
+        <div class="avatar-icon">${enablerChar.icon}</div>
         <div class="avatar-pulse"></div>
       </div>
       <div class="speech-bubble">
         <div class="bubble-header">
-          <span class="bubble-name">The Enabler</span>
+          <span class="bubble-name">${enablerChar.name}</span>
           <span class="bubble-status">...</span>
         </div>
         <div class="bubble-content"></div>
@@ -36,12 +44,12 @@ function createDebateModal() {
     <!-- Skeptic Character -->
     <div class="debate-character skeptic-character">
       <div class="character-avatar">
-        <div class="avatar-icon">?</div>
+        <div class="avatar-icon">${skepticChar.icon}</div>
         <div class="avatar-pulse"></div>
       </div>
       <div class="speech-bubble">
         <div class="bubble-header">
-          <span class="bubble-name">The Skeptic</span>
+          <span class="bubble-name">${skepticChar.name}</span>
           <span class="bubble-status">...</span>
         </div>
         <div class="bubble-content"></div>
@@ -51,12 +59,12 @@ function createDebateModal() {
     <!-- Mediator Character -->
     <div class="debate-character mediator-character">
       <div class="character-avatar">
-        <div class="avatar-icon">=</div>
+        <div class="avatar-icon">${mediatorChar.icon}</div>
         <div class="avatar-pulse"></div>
       </div>
       <div class="speech-bubble">
         <div class="bubble-header">
-          <span class="bubble-name">The Mediator</span>
+          <span class="bubble-name">${mediatorChar.name}</span>
           <span class="bubble-status">...</span>
         </div>
         <div class="bubble-content"></div>
@@ -67,12 +75,12 @@ function createDebateModal() {
     <div class="debate-actions">
       <button class="action-btn remind-btn">Remind Me Later</button>
       <button class="action-btn reconsider-btn">I'll Reconsider</button>
-      <button class="action-btn proceed-btn">Proceed to Purchase</button>
+      <button class="action-btn proceed-btn">${currentTheme === THEMES.REGINA ? "That's So Fetch! 💖" : "Proceed to Purchase"}</button>
     </div>
 
     <!-- Savings Tracker -->
     <div class="savings-tracker">
-      <div class="savings-label">This Month</div>
+      <div class="savings-label">${currentTheme === THEMES.REGINA ? "This Month's Wins 👑" : "This Month"}</div>
       <div class="savings-stats">
         <div class="stat-item">
           <span class="stat-value" id="saved-amount">$0</span>
@@ -83,6 +91,11 @@ function createDebateModal() {
           <span class="stat-label">Reconsidered</span>
         </div>
       </div>
+    </div>
+
+    <!-- Sound Toggle -->
+    <div class="sound-toggle">
+      <button id="sound-toggle-btn">🔊</button>
     </div>
 
     <!-- Close Button -->
@@ -96,6 +109,9 @@ function createDebateModal() {
   modal.querySelector('.remind-btn').addEventListener('click', handleRemindLater);
   modal.querySelector('.reconsider-btn').addEventListener('click', handleReconsider);
   modal.querySelector('.proceed-btn').addEventListener('click', handleProceed);
+
+  const soundToggleBtn = modal.querySelector('#sound-toggle-btn');
+  soundToggleBtn.addEventListener('click', toggleSound);
 
   debateModal = modal;
   return modal;
@@ -187,10 +203,13 @@ function updatePriceDisplay(price) {
 }
 
 // Show the debate characters
-function showDebateModal() {
-  const modal = createDebateModal();
+async function showDebateModal() {
+  // Initialize theme and wait for stylesheet injection
+  currentTheme = await initializeTheme();
+  
+  // Create modal with current theme applied
+  const modal = await createDebateModal();
   modal.classList.add('active');
-  // Characters slide in - no need to hide page overflow
 }
 
 // Close the debate characters
@@ -255,11 +274,11 @@ function clearPersonalityResponse(personality) {
 }
 
 // Start the debate
-function startDebate() {
+async function startDebate() {
   if (isDebateActive) return;
 
   isDebateActive = true;
-  showDebateModal();
+  await showDebateModal();
 
   // Reset all personalities
   ['enabler', 'skeptic', 'mediator'].forEach(p => {
@@ -355,6 +374,40 @@ if (isCheckoutPage()) {
       }
     });
   }
+}
+
+// Initialize theme on page load
+initializeTheme().then(theme => {
+  console.log(`[ShoppingDebate] Content script loaded with theme: ${theme}`);
+});
+
+// Listen for theme changes from popup
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === 'THEME_CHANGED') {
+    console.log(`[ThemeChange] Switching to: ${message.themeId}`);
+    currentTheme = message.themeId;
+    // Force modal recreation on next open
+    if (debateModal) {
+      debateModal.remove();
+      debateModal = null;
+    }
+    initializeTheme();
+  }
+});
+
+// Toggle sound
+async function toggleSound() {
+  const { sound = true } = await chrome.storage.sync.get(['sound']);
+  await chrome.storage.sync.set({ sound: !sound });
+  updateSoundToggle();
+}
+
+// Update sound toggle
+async function updateSoundToggle() {
+  if (!debateModal) return;
+  const { sound = true } = await chrome.storage.sync.get(['sound']);
+  const btn = debateModal.querySelector('#sound-toggle-btn');
+  if (btn) btn.textContent = sound ? '🔊' : '🔇';
 }
 
 console.log('Shopping Debate content script loaded');
