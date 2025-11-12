@@ -13,8 +13,12 @@ Three AI personalities debate your purchase decisions before checkout. Make thou
 - **Real-Time AI Streaming**: Watch three personalities debate token-by-token (not simulated!)
 - **Automatic Checkout Detection**: Triggers on checkout pages across any e-commerce site
 - **Context-Aware Debates**: Each personality references actual product names and prices
+- **Prominent Price Display**: See the price you're considering at the top of the debate
+- **Price Threshold**: Only trigger debates for purchases above your set amount (default: $50)
+- **Remind Me Later**: Set 3-day reminders for purchases you want to reconsider
+- **Monthly Savings Tracker**: Track how much you've saved by reconsidering purchases
 - **"Yes, And..." Improv Style**: The Mediator builds upon specific arguments from both sides
-- **Beautiful UI**: Gradient design with smooth animations
+- **Beautiful UI**: Animated character dialog boxes with gradient design
 - **Multiple AI Models**: Choose from Claude, GPT-4, GPT-3.5, and more
 
 ## Quick Start
@@ -65,8 +69,9 @@ chrome://extensions/
 1. Click the extension icon
 2. Click "Open Settings"
 3. Paste your OpenRouter API key
-4. Choose AI model (Claude 3 Haiku recommended)
-5. Save settings
+4. Set price threshold (default: $50 - only triggers for purchases above this amount)
+5. Choose AI models for each personality (Claude 3 Haiku recommended)
+6. Save settings
 
 **Option B: Development Mode (.env file)**
 1. Copy `.env.example` to `.env`
@@ -87,17 +92,20 @@ Visit any checkout page - the debate will start automatically!
 ## How It Works
 
 ```
-You reach checkout
+You reach checkout (price meets threshold)
     ↓
-Modal appears with product context
+Character dialog boxes appear showing price
     ↓
-Enabler streams their argument
+Enabler streams their argument (emphasizes value)
     ↓
-Skeptic streams their counterpoint
+Skeptic streams their counterpoint (questions cost)
     ↓
-Mediator synthesizes both views
+Mediator synthesizes both views (balanced guidance)
     ↓
-You decide: Proceed or Reconsider
+You choose an action:
+  - Remind Me Later (3-day reminder)
+  - I'll Reconsider (saves to monthly tracker)
+  - Proceed to Purchase (continues checkout)
 ```
 
 ## Testing
@@ -114,15 +122,44 @@ Open `test-checkout.html` in Chrome to see the extension in action!
 
 ## Configuration
 
+### Price Threshold
+
+Control when debates trigger based on purchase amount:
+- **Default**: $50 (only triggers for purchases above this amount)
+- **Set to 0**: Triggers on all purchases regardless of price
+- **Configure**: Extension Settings > Price Threshold field
+
+This helps focus debates on significant purchases while avoiding debate fatigue on small items.
+
+### Monthly Savings Tracker
+
+Track your financial wins when you reconsider purchases:
+- **Location**: Bottom of character dialog box (green card)
+- **Metrics**: Total saved amount and number of reconsidered purchases this month
+- **Storage**: Data persists month-by-month in Chrome storage
+- **Reset**: Automatically starts fresh each new month
+
+### Reminders
+
+Set reminders for purchases you want to think about:
+- **Duration**: 3 days from when you click "Remind Me Later"
+- **Storage**: Saved in Chrome local storage with product details and URL
+- **Use Case**: Prevent impulse buying by adding a cooling-off period
+
 ### AI Models
+
+Choose different models for each personality to create unique debate dynamics:
 
 | Model | Speed | Quality | Cost | Best For |
 |-------|-------|---------|------|----------|
 | Claude 3 Haiku | Fast | Good | Low | Recommended |
-| Claude 3 Sonnet | Medium | Great | Medium | Balanced |
+| Claude 3.5 Sonnet | Medium | Great | Medium | Balanced |
+| Claude 3 Opus | Slow | Excellent | High | Premium Quality |
 | GPT-3.5 Turbo | Fast | Good | Low | Fast & Cheap |
 | GPT-4 | Slow | Excellent | High | Maximum Quality |
 | Llama 3 8B | Medium | Good | Low | Budget |
+
+**Tip**: Assign faster models (Haiku, GPT-3.5) to The Enabler, balanced models (Sonnet) to The Skeptic, and premium models (Opus, GPT-4) to The Mediator for optimal debate quality.
 
 Check [OpenRouter pricing](https://openrouter.ai/models) for current rates.
 
@@ -331,11 +368,13 @@ Enhance `extractProductContext()` in `src/content/checkout.js`:
 
 ## Use Cases
 
-**Impulse Control** - Add meaningful friction to checkout decisions
-**Budget Management** - Second-guess purchases before committing
-**Decision Training** - Learn to consider multiple perspectives
-**Mindful Shopping** - Slow down and think before buying
-**Value Assessment** - Practice evaluating cost vs benefit
+**Impulse Control** - Add meaningful friction to checkout decisions with cooling-off reminders
+**Budget Management** - Track monthly savings and see the financial impact of reconsidering purchases
+**Decision Training** - Learn to consider multiple perspectives through AI-guided debate
+**Mindful Shopping** - Slow down and think before buying with price-aware discussions
+**Value Assessment** - Practice evaluating cost vs benefit with AI personalities
+**Financial Goals** - Set price thresholds to focus on significant purchases only
+**Savings Motivation** - Watch your monthly savings grow as you make thoughtful choices
 
 ## Privacy & Security
 
@@ -347,15 +386,18 @@ Enhance `extractProductContext()` in `src/content/checkout.js`:
 
 ## Future Enhancements
 
-Ideas for v2.0:
+Ideas for future versions:
 
-- **Debate History**: Track past decisions and outcomes
-- **Learning Mode**: Extension learns your values over time
-- **Budget Tracking**: Integration with financial goals
-- **Social Sharing**: Share interesting debates
-- **A/B Testing**: Measure which personality is most persuasive
+- **Reminder Notifications**: Browser notifications when 3-day reminder is up
+- **Debate History**: Full archive of past debates with outcomes
+- **Learning Mode**: Extension learns your values and priorities over time
+- **Spending Insights**: Visualize savings trends and purchase patterns
+- **Category Tracking**: Track savings by product category
+- **Social Sharing**: Share interesting debates with friends
+- **A/B Testing**: Measure which personality is most persuasive for you
 - **Voice Mode**: Hear the debate instead of reading it
-- **Custom Personalities**: Create your own AI advisors
+- **Custom Personalities**: Create your own AI advisors with custom prompts
+- **Budget Goals**: Set monthly spending limits and get warnings
 
 ## Contributing
 
