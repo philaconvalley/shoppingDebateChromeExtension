@@ -1,8 +1,8 @@
 // Popup Controller
-console.log('✅ Shopping Debate popup loaded - API keys embedded from .env');
+console.log('[INFO] Shopping Debate popup loaded - API keys embedded from .env');
 
 document.getElementById('testDebate').addEventListener('click', async () => {
-  console.log('🧪 Test button clicked');
+  console.log('[TEST] Test button clicked');
 
   // Get active tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

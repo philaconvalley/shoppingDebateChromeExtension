@@ -8,14 +8,14 @@ const DEV_API_KEYS = [
   process.env.OPENROUTER_API_KEY2_PART1 + process.env.OPENROUTER_API_KEY2_PART2
 ].filter(key => key && key.length > 10 && key.startsWith('sk-or-'));
 
-console.log('🔍 Key initialization:');
+console.log('[DEBUG] Key initialization:');
 console.log('  Key 1 parts:', process.env.OPENROUTER_API_KEY_PART1, '+', process.env.OPENROUTER_API_KEY_PART2?.substring(0, 10) + '...');
 console.log('  Key 2 parts:', process.env.OPENROUTER_API_KEY2_PART1, '+', process.env.OPENROUTER_API_KEY2_PART2?.substring(0, 10) + '...');
-console.log(`🔑 Total API keys loaded: ${DEV_API_KEYS.length}`);
+console.log(`[INFO] Total API keys loaded: ${DEV_API_KEYS.length}`);
 if (DEV_API_KEYS.length > 0) {
-  console.log('✅ Primary API key:', DEV_API_KEYS[0].substring(0, 15) + '...');
+  console.log('[SUCCESS] Primary API key:', DEV_API_KEYS[0].substring(0, 15) + '...');
   if (DEV_API_KEYS.length > 1) {
-    console.log('✅ Secondary API key:', DEV_API_KEYS[1].substring(0, 15) + '...');
+    console.log('[SUCCESS] Secondary API key:', DEV_API_KEYS[1].substring(0, 15) + '...');
   }
 }
 
@@ -25,14 +25,14 @@ let currentKeyIndex = 0;
 // Get API keys (embedded from .env only)
 async function getApiKeys() {
   // Always use embedded keys from .env
-  console.log('📋 Retrieving embedded API keys...');
-  console.log('📋 DEV_API_KEYS available:', DEV_API_KEYS.length);
+  console.log('[INFO] Retrieving embedded API keys...');
+  console.log('[INFO] DEV_API_KEYS available:', DEV_API_KEYS.length);
 
   if (DEV_API_KEYS.length > 0) {
     return DEV_API_KEYS;
   }
 
-  console.error('❌ No API keys found! Make sure .env file is configured and npm run build was executed.');
+  console.error('[ERROR] No API keys found! Make sure .env file is configured and npm run build was executed.');
   return [];
 }
 
