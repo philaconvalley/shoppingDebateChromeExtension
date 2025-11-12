@@ -219,33 +219,68 @@
       </div>
 
       <div class="form-group">
-        <label for="model">AI Model</label>
-        <select id="model">
-          <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Recommended)</option>
-          <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
-          <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
-          <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
-          <option value="openai/gpt-4">GPT-4</option>
-          <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
-          <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B</option>
-        </select>
-        <p class="hint">
-          Different models have different speeds and costs.
-          <a href="https://openrouter.ai/models" target="_blank">View pricing</a>
+        <label>Personality Models</label>
+        <p class="hint" style="margin-top: 0; margin-bottom: 16px;">
+          Assign different AI models to each personality for unique debate styles.
+          <a href="https://openrouter.ai/models" target="_blank">View all models</a>
         </p>
 
-        <div class="model-info">
+        <div style="display: grid; gap: 16px;">
+          <div>
+            <label for="modelEnabler" style="font-size: 13px; color: #667eea;">+ The Enabler</label>
+            <select id="modelEnabler">
+              <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</option>
+              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Balanced)</option>
+              <option value="anthropic/claude-3-opus">Claude 3 Opus (Premium)</option>
+              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (Fast)</option>
+              <option value="openai/gpt-4">GPT-4 (Premium)</option>
+              <option value="openai/gpt-4-turbo">GPT-4 Turbo (Balanced)</option>
+              <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (Fast)</option>
+              <option value="google/gemini-pro">Gemini Pro (Balanced)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="modelSkeptic" style="font-size: 13px; color: #f59e0b;">? The Skeptic</label>
+            <select id="modelSkeptic">
+              <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</option>
+              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Balanced)</option>
+              <option value="anthropic/claude-3-opus">Claude 3 Opus (Premium)</option>
+              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (Fast)</option>
+              <option value="openai/gpt-4">GPT-4 (Premium)</option>
+              <option value="openai/gpt-4-turbo">GPT-4 Turbo (Balanced)</option>
+              <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (Fast)</option>
+              <option value="google/gemini-pro">Gemini Pro (Balanced)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="modelMediator" style="font-size: 13px; color: #10b981;">= The Mediator</label>
+            <select id="modelMediator">
+              <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</option>
+              <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Balanced)</option>
+              <option value="anthropic/claude-3-opus">Claude 3 Opus (Premium)</option>
+              <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (Fast)</option>
+              <option value="openai/gpt-4">GPT-4 (Premium)</option>
+              <option value="openai/gpt-4-turbo">GPT-4 Turbo (Balanced)</option>
+              <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (Fast)</option>
+              <option value="google/gemini-pro">Gemini Pro (Balanced)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="model-info" style="margin-top: 16px;">
           <div class="model-card">
-            <strong>Fast</strong>
-            <span>Claude Haiku, GPT-3.5</span>
+            <strong>Fast & Cheap</strong>
+            <span>Haiku, GPT-3.5, Llama</span>
           </div>
           <div class="model-card">
             <strong>Balanced</strong>
-            <span>Claude Sonnet, GPT-4 Turbo</span>
+            <span>Sonnet, GPT-4 Turbo, Gemini</span>
           </div>
           <div class="model-card">
-            <strong>Premium</strong>
-            <span>Claude Opus, GPT-4</span>
+            <strong>Premium Quality</strong>
+            <span>Opus, GPT-4</span>
           </div>
         </div>
       </div>

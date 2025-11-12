@@ -46,10 +46,14 @@ function getNextKeyIndex(keys) {
   return index;
 }
 
-// Get selected model from storage
-async function getModel() {
-  const result = await chrome.storage.sync.get(['model']);
-  return result.model || 'anthropic/claude-3-haiku';
+// Get personality-specific models from storage
+async function getModels() {
+  const result = await chrome.storage.sync.get(['models']);
+  return result.models || {
+    enabler: 'anthropic/claude-3-haiku',
+    skeptic: 'anthropic/claude-3.5-sonnet',
+    mediator: 'anthropic/claude-3-opus'
+  };
 }
 
 // Build Enabler prompt
@@ -187,18 +191,19 @@ async function streamPersonalityWithFallback(prompt, model, keys, tabId, persona
 async function handleStreamingDebate(productContext, tabId) {
   try {
     const apiKeys = await getApiKeys();
-    const model = await getModel();
+    const models = await getModels();
 
     if (apiKeys.length === 0) {
       throw new Error('No API keys configured. Please add your OpenRouter API key in settings.');
     }
 
     console.log(`Using ${apiKeys.length} API key(s) with rotation and fallback`);
+    console.log('[INFO] Models:', `Enabler: ${models.enabler}, Skeptic: ${models.skeptic}, Mediator: ${models.mediator}`);
 
     // Stream Enabler
     const enablerResponse = await streamPersonalityWithFallback(
       buildEnablerPrompt(productContext),
-      model,
+      models.enabler,
       apiKeys,
       tabId,
       'enabler'
@@ -207,7 +212,7 @@ async function handleStreamingDebate(productContext, tabId) {
     // Stream Skeptic
     const skepticResponse = await streamPersonalityWithFallback(
       buildSkepticPrompt(productContext),
-      model,
+      models.skeptic,
       apiKeys,
       tabId,
       'skeptic'
@@ -216,7 +221,7 @@ async function handleStreamingDebate(productContext, tabId) {
     // Stream Mediator with context from both
     await streamPersonalityWithFallback(
       buildMediatorPrompt(productContext, enablerResponse, skepticResponse),
-      model,
+      models.mediator,
       apiKeys,
       tabId,
       'mediator'

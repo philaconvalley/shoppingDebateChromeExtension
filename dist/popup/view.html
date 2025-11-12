@@ -98,6 +98,52 @@
       text-align: center;
       opacity: 0.8;
     }
+
+    .model-quick-select {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 12px;
+    }
+
+    .model-quick-select h3 {
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .model-quick-select select {
+      width: 100%;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+    }
+
+    .model-label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    .settings-link {
+      color: white;
+      text-decoration: none;
+      opacity: 0.8;
+      font-size: 12px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .settings-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -107,6 +153,38 @@
   <div class="status">
     <span class="status-indicator"></span>
     Extension is active
+  </div>
+
+  <div class="model-quick-select">
+    <h3>Quick Model Switch</h3>
+    <label class="model-label">+ Enabler</label>
+    <select id="quickModelEnabler">
+      <option value="anthropic/claude-3-haiku">Claude Haiku</option>
+      <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+      <option value="anthropic/claude-3-opus">Claude Opus</option>
+      <option value="openai/gpt-3.5-turbo">GPT-3.5</option>
+      <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+    </select>
+
+    <label class="model-label">? Skeptic</label>
+    <select id="quickModelSkeptic">
+      <option value="anthropic/claude-3-haiku">Claude Haiku</option>
+      <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+      <option value="anthropic/claude-3-opus">Claude Opus</option>
+      <option value="openai/gpt-3.5-turbo">GPT-3.5</option>
+      <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+    </select>
+
+    <label class="model-label">= Mediator</label>
+    <select id="quickModelMediator">
+      <option value="anthropic/claude-3-haiku">Claude Haiku</option>
+      <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+      <option value="anthropic/claude-3-opus">Claude Opus</option>
+      <option value="openai/gpt-3.5-turbo">GPT-3.5</option>
+      <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+    </select>
+
+    <a href="#" id="openSettings" class="settings-link">More options →</a>
   </div>
 
   <div class="actions">
