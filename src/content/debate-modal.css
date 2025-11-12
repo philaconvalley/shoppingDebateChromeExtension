@@ -271,6 +271,33 @@
   white-space: pre-wrap;
 }
 
+/* Currently speaking text - highlighted with animation */
+.speaking-highlight {
+  background: linear-gradient(90deg,
+    rgba(255, 235, 59, 0.3) 0%,
+    rgba(255, 235, 59, 0.6) 50%,
+    rgba(255, 235, 59, 0.3) 100%);
+  background-size: 200% 100%;
+  animation: highlightSlide 2s ease-in-out infinite;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 700;
+  color: #1f2937;
+  box-shadow: 0 0 8px rgba(255, 235, 59, 0.4);
+}
+
+@keyframes highlightSlide {
+  0% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .bubble-content::-webkit-scrollbar {
   width: 6px;
 }
@@ -547,5 +574,33 @@
 
   .bubble-content {
     font-size: 12px;
+  }
+}
+
+/* Karaoke-style word highlighting */
+.word {
+  transition: all 0.2s ease;
+  display: inline;
+}
+
+.word-highlight {
+  background: linear-gradient(120deg, rgba(255, 255, 100, 0.4) 0%, rgba(255, 200, 100, 0.5) 100%);
+  color: #000;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(255, 200, 0, 0.3);
+  animation: wordPulse 0.3s ease;
+}
+
+@keyframes wordPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
   }
 }

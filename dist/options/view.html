@@ -47,6 +47,46 @@
       </div>
 
       <div class="form-group">
+        <label for="elevenlabsApiKey">ElevenLabs API Key (Optional)</label>
+        <input
+          type="text"
+          id="elevenlabsApiKey"
+          placeholder="sk_..."
+          autocomplete="off"
+        >
+        <p class="hint">
+          Enable high-quality voice narration for the debate personalities.
+          <a href="https://elevenlabs.io" target="_blank">Get your key</a>
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="enableVoice" style="width: auto; cursor: pointer;">
+          <span>Enable Voice Narration</span>
+        </label>
+        <p class="hint">
+          When enabled, each personality will speak their responses using unique AI voices. Requires an ElevenLabs API key.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="voiceSpeed">Voice Speed: <span id="voiceSpeedValue">1.0x</span></label>
+        <input
+          type="range"
+          id="voiceSpeed"
+          min="0.5"
+          max="2.0"
+          step="0.1"
+          value="1.0"
+          style="width: 100%;"
+        >
+        <p class="hint">
+          Adjust the playback speed of all voice narration (0.5x = slower, 2.0x = faster).
+        </p>
+      </div>
+
+      <div class="form-group">
         <label>Personality Models</label>
         <p class="hint" style="margin-top: 0; margin-bottom: 16px;">
           Assign different AI models to each personality for unique debate styles.

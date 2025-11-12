@@ -53,3 +53,26 @@ export const CHECKOUT_PATTERNS = [
   /purchase/i,
   /pay/i
 ];
+
+// Voice configuration for each personality (ElevenLabs)
+export const PERSONALITY_VOICES = {
+  enabler: {
+    voiceId: 'pNInz6obpgDQGcFmaJgB',  // Adam - Warm, enthusiastic voice
+    speed: 1.1         // Slightly faster for energy
+  },
+  skeptic: {
+    voiceId: 'ErXwobaYiN019PkySvjV', // Antoni - Measured, thoughtful voice
+    speed: 0.95        // Slightly slower for deliberation
+  },
+  mediator: {
+    voiceId: 'VR6AewLTigWG4xSOukaG',  // Arnold - Balanced, calm voice
+    speed: 1.0         // Normal pace
+  }
+};
+
+// Audio message types
+export const AUDIO_MESSAGE_TYPES = {
+  PERSONALITY_AUDIO: 'personalityAudio',
+  PERSONALITY_SPEAKING: 'personalitySpeaking',
+  PERSONALITY_AUDIO_COMPLETE: 'personalityAudioComplete'
+};

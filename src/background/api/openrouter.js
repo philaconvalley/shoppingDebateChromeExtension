@@ -1,6 +1,9 @@
 // OpenRouter API Client
 
 import { OpenRouter } from '@openrouter/sdk';
+import { generateSpeech, extractCompleteSentences } from '../services/audio.js';
+import { AUDIO_MESSAGE_TYPES } from '../../shared/constants.js';
+import { getSyncStorage } from '../../shared/storage.js';
 
 /**
  * Stream a single personality's response using OpenRouter SDK
@@ -21,6 +24,20 @@ export async function streamPersonality(prompt, model, apiKey, tabId, personalit
   });
 
   let fullResponse = '';
+  let sentenceBuffer = '';
+
+  // Load voice settings
+  const settings = await getSyncStorage(['enableVoice', 'voiceSpeed', 'elevenlabsApiKey']);
+  const enableVoice = settings.enableVoice !== undefined ? settings.enableVoice : true;
+  const voiceSpeed = settings.voiceSpeed !== undefined ? settings.voiceSpeed : 1.0;
+  const elevenlabsApiKey = settings.elevenlabsApiKey || null;
+
+  console.log(`[Audio Pipeline] Voice settings loaded for ${personalityName}:`, {
+    enableVoice,
+    voiceSpeed,
+    hasApiKey: !!elevenlabsApiKey,
+    apiKeySource: elevenlabsApiKey ? 'user-settings' : 'environment'
+  });
 
   // Signal personality started
   chrome.tabs.sendMessage(tabId, {
@@ -42,21 +59,81 @@ export async function streamPersonality(prompt, model, apiKey, tabId, personalit
 
       if (content) {
         fullResponse += content;
+        sentenceBuffer += content;
 
-        // Send chunk to content script
+        // Send text chunk to content script for display
         chrome.tabs.sendMessage(tabId, {
           type: 'personalityChunk',
           personality: personalityName,
           chunk: content
         });
+
+        // Check if we have complete sentences
+        const { complete, remaining } = extractCompleteSentences(sentenceBuffer);
+
+        // Generate audio for each complete sentence (if voice is enabled)
+        if (enableVoice) {
+          for (const sentence of complete) {
+            console.log(`[Audio] Generating audio for sentence: "${sentence.substring(0, 50)}..."`);
+
+            // Generate speech audio (runs in parallel with streaming)
+            generateSpeech(sentence, personalityName, voiceSpeed, elevenlabsApiKey).then(audioData => {
+              if (audioData) {
+                // Send audio data to content script
+                chrome.tabs.sendMessage(tabId, {
+                  type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO,
+                  personality: personalityName,
+                  audioData: audioData,
+                  sentence: sentence
+                });
+              }
+            }).catch(error => {
+              console.error(`[Audio] Failed to generate audio for ${personalityName}:`, error);
+            });
+          }
+        }
+
+        // Update buffer with remaining incomplete text
+        sentenceBuffer = remaining;
       }
     }
+
+    // Handle any remaining text in buffer at the end (if voice is enabled)
+    if (enableVoice && sentenceBuffer.trim().length > 0) {
+      console.log(`[Audio] Generating audio for final fragment: "${sentenceBuffer.substring(0, 50)}..."`);
+
+      generateSpeech(sentenceBuffer, personalityName, voiceSpeed, elevenlabsApiKey).then(audioData => {
+        if (audioData) {
+          chrome.tabs.sendMessage(tabId, {
+            type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO,
+            personality: personalityName,
+            audioData: audioData,
+            sentence: sentenceBuffer
+          });
+        }
+
+        // Signal audio generation complete
+        chrome.tabs.sendMessage(tabId, {
+          type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO_COMPLETE,
+          personality: personalityName
+        });
+      }).catch(error => {
+        console.error(`[Audio] Failed to generate final audio for ${personalityName}:`, error);
+      });
+    } else {
+      // Signal audio generation complete even if no remaining text or voice disabled
+      chrome.tabs.sendMessage(tabId, {
+        type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO_COMPLETE,
+        personality: personalityName
+      });
+    }
+
   } catch (error) {
     console.error(`Error streaming ${personalityName}:`, error);
     throw error;
   }
 
-  // Signal personality completed
+  // Signal personality text completed
   chrome.tabs.sendMessage(tabId, {
     type: 'personalityComplete',
     personality: personalityName

@@ -55,7 +55,8 @@ module.exports = (env, argv) => {
         'process.env.OPENROUTER_API_KEY_PART1': JSON.stringify(process.env.OPENROUTER_API_KEY_PART1 || ''),
         'process.env.OPENROUTER_API_KEY_PART2': JSON.stringify(process.env.OPENROUTER_API_KEY_PART2 || ''),
         'process.env.OPENROUTER_API_KEY2_PART1': JSON.stringify(process.env.OPENROUTER_API_KEY2_PART1 || ''),
-        'process.env.OPENROUTER_API_KEY2_PART2': JSON.stringify(process.env.OPENROUTER_API_KEY2_PART2 || '')
+        'process.env.OPENROUTER_API_KEY2_PART2': JSON.stringify(process.env.OPENROUTER_API_KEY2_PART2 || ''),
+        'process.env.ELEVENLABS_API_KEY': JSON.stringify(process.env.ELEVENLABS_API_KEY || '')
       }),
 
       // Copy static assets to dist

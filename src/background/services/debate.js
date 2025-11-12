@@ -3,7 +3,7 @@
 import { getModels } from '../../shared/storage.js';
 import { DEFAULT_MODELS, PERSONALITIES, MESSAGE_TYPES } from '../../shared/constants.js';
 import { streamPersonalityWithFallback } from '../api/openrouter.js';
-import { buildEnablerPrompt, buildSkepticPrompt, buildMediatorPrompt } from '../api/prompts.js';
+import { buildEnablerPrompt, buildSkepticPrompt, buildMediatorPrompt, buildEnablerFinalPrompt } from '../api/prompts.js';
 
 /**
  * Handle streaming debate generation
@@ -23,7 +23,7 @@ export async function handleStreamingDebate(productContext, tabId, apiKeys, getN
     console.log(`Using ${apiKeys.length} API key(s) with rotation and fallback`);
     console.log('[INFO] Models:', `Enabler: ${models.enabler}, Skeptic: ${models.skeptic}, Mediator: ${models.mediator}`);
 
-    // Stream Enabler
+    // Round 1: Stream Enabler (initial argument)
     const enablerResponse = await streamPersonalityWithFallback(
       buildEnablerPrompt(productContext),
       models.enabler,
@@ -33,7 +33,7 @@ export async function handleStreamingDebate(productContext, tabId, apiKeys, getN
       getNextKeyIndex
     );
 
-    // Stream Skeptic - now responds to Enabler
+    // Round 2: Stream Skeptic (responds to Enabler)
     const skepticResponse = await streamPersonalityWithFallback(
       buildSkepticPrompt(productContext, enablerResponse),
       models.skeptic,
@@ -43,13 +43,23 @@ export async function handleStreamingDebate(productContext, tabId, apiKeys, getN
       getNextKeyIndex
     );
 
-    // Stream Mediator with context from both
-    await streamPersonalityWithFallback(
+    // Round 3: Stream Mediator (synthesizes both perspectives)
+    const mediatorResponse = await streamPersonalityWithFallback(
       buildMediatorPrompt(productContext, enablerResponse, skepticResponse),
       models.mediator,
       apiKeys,
       tabId,
       PERSONALITIES.MEDIATOR,
+      getNextKeyIndex
+    );
+
+    // Round 4: Stream Enabler again (final decision after hearing everyone)
+    await streamPersonalityWithFallback(
+      buildEnablerFinalPrompt(productContext, enablerResponse, skepticResponse, mediatorResponse),
+      models.enabler,
+      apiKeys,
+      tabId,
+      PERSONALITIES.ENABLER,
       getNextKeyIndex
     );
 
