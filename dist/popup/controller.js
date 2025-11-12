@@ -1,0 +1,1 @@
+console.log("✅ Shopping Debate popup loaded - API keys embedded from .env"),document.getElementById("testDebate").addEventListener("click",async()=>{console.log("🧪 Test button clicked");const[e]=await chrome.tabs.query({active:!0,currentWindow:!0});chrome.tabs.sendMessage(e.id,{type:"triggerDebate"}),window.close()});

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Debate - Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .hint a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .hint a:hover {
+      text-decoration: underline;
+    }
+
+    .model-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .model-card {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .model-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .model-card span {
+      color: #666;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .status-message {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .status-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status-message.show {
+      display: block;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 32px 0;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .info-box p {
+      margin: 0;
+      font-size: 14px;
+      color: #1565c0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Settings</h1>
+    <p class="subtitle">Configure your Shopping Debate extension</p>
+
+    <div class="info-box">
+      <p>
+        <strong>Need an API key?</strong><br>
+        Visit <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> to create a free account and get your API key. New users receive free credits!
+      </p>
+    </div>
+
+    <form id="settingsForm">
+      <div class="form-group">
+        <label for="apiKey">OpenRouter API Key</label>
+        <input
+          type="text"
+          id="apiKey"
+          placeholder="sk-or-v1-..."
+          autocomplete="off"
+        >
+        <p class="hint">
+          Your API key is stored securely in Chrome's encrypted storage.
+          <a href="https://openrouter.ai/keys" target="_blank">Get your key</a>
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="model">AI Model</label>
+        <select id="model">
+          <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Recommended)</option>
+          <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
+          <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+          <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+          <option value="openai/gpt-4">GPT-4</option>
+          <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+          <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B</option>
+        </select>
+        <p class="hint">
+          Different models have different speeds and costs.
+          <a href="https://openrouter.ai/models" target="_blank">View pricing</a>
+        </p>
+
+        <div class="model-info">
+          <div class="model-card">
+            <strong>Fast</strong>
+            <span>Claude Haiku, GPT-3.5</span>
+          </div>
+          <div class="model-card">
+            <strong>Balanced</strong>
+            <span>Claude Sonnet, GPT-4 Turbo</span>
+          </div>
+          <div class="model-card">
+            <strong>Premium</strong>
+            <span>Claude Opus, GPT-4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">Save Settings</button>
+        <button type="button" id="resetBtn" class="btn-secondary">Reset to Defaults</button>
+      </div>
+
+      <div id="statusMessage" class="status-message"></div>
+    </form>
+
+    <div class="divider"></div>
+
+    <div class="info-box">
+      <p>
+        <strong>How it works:</strong><br>
+        The extension automatically triggers on checkout pages. Three AI personalities will debate your purchase decision in real-time, helping you make more thoughtful choices.
+      </p>
+    </div>
+  </div>
+
+  <script src="controller.js"></script>
+</body>
+</html>
