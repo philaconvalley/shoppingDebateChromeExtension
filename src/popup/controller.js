@@ -63,9 +63,10 @@ async function initializeThemeToggle() {
       });
 
       // Show visual feedback
-      btn.textContent = btn.textContent + ' ✓';
+      const originalText = btn.textContent;
+      btn.textContent = btn.textContent + ' (saved)';
       setTimeout(() => {
-        btn.textContent = btn.textContent.replace(' ✓', '');
+        btn.textContent = originalText;
       }, 1000);
     });
   });

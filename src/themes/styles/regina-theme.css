@@ -194,7 +194,7 @@
 }
 
 [data-theme="regina"] .enabler-character .avatar-icon::before {
-  content: '👑';
+  content: 'R';
 }
 
 /* Gretchen's Avatar - Nervous Face */
@@ -206,7 +206,7 @@
 }
 
 [data-theme="regina"] .skeptic-character .avatar-icon::before {
-  content: '😬';
+  content: 'G';
 }
 
 /* Karen's Avatar - Shrug Face */
@@ -218,7 +218,7 @@
 }
 
 [data-theme="regina"] .mediator-character .avatar-icon::before {
-  content: '🤷‍♀️';
+  content: 'K';
 }
 
 
@@ -422,7 +422,7 @@
 [data-theme="regina"] .bubble-content {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--text-primary);  /* White - High contrast (16.6:1) ✅ */
+  color: var(--text-primary);  /* White - High contrast (16.6:1) */
   font-family: var(--font-body);
   font-weight: 400;  /* Normal weight on dark background */
 }
@@ -437,7 +437,7 @@
 
 /* Text streaming sparkle effect */
 [data-theme="regina"] .bubble-content:last-child::after {
-  content: '✨';
+  content: '';
   opacity: 0;
   animation: sparkle 0.6s ease-out;
   margin-left: 4px;
@@ -489,7 +489,7 @@
 }
 
 [data-theme="regina"] .proceed-btn::before {
-  content: '✨';
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -570,7 +570,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--text-primary);  /* High contrast: 12.6:1 ✅ */
+  color: var(--text-primary);  /* High contrast: 12.6:1 */
   text-align: center;
   margin-bottom: 12px;
   /* Add pink glow for royal flair */
@@ -593,7 +593,7 @@
   font-family: var(--font-headline);
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-primary);  /* High contrast: 12.6:1 ✅ */
+  color: var(--text-primary);  /* High contrast: 12.6:1 */
   /* Add pink glow for style */
   text-shadow: 0 0 12px rgba(255, 20, 147, 0.4);
   margin-bottom: 4px;

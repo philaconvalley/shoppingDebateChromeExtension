@@ -547,7 +547,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('[Content] Received message:', message.type);
 
   if (message.type === 'THEME_CHANGED') {
-    console.log(`[ThemeChange] ✅ Received THEME_CHANGED message`);
+    console.log(`[ThemeChange] Received THEME_CHANGED message`);
     console.log(`[ThemeChange] Switching from "${currentTheme}" to "${message.themeId}"`);
 
     currentTheme = message.themeId;

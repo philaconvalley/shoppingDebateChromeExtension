@@ -20,19 +20,19 @@ export const THEME_CHARACTERS = {
     mediator: { name: 'The Mediator', icon: '=' },
   },
   regina: {
-    enabler: { name: 'Regina George', icon: '👑' },
-    skeptic: { name: 'Gretchen Wieners', icon: '😬' },
-    mediator: { name: 'Karen Smith', icon: '🤷‍♀️' },
+    enabler: { name: 'Regina George', icon: 'R' },
+    skeptic: { name: 'Gretchen Wieners', icon: 'G' },
+    mediator: { name: 'Karen Smith', icon: 'K' },
   },
   telenovela: {
-    enabler: { name: 'Valentina', icon: '💔' },
-    skeptic: { name: 'Alejandro', icon: '😈' },
-    mediator: { name: 'Isabella', icon: '🕯️' },
+    enabler: { name: 'Valentina', icon: 'V' },
+    skeptic: { name: 'Alejandro', icon: 'A' },
+    mediator: { name: 'Isabella', icon: 'I' },
   },
   wwf: {
-    enabler: { name: 'The Bulldozer', icon: '💪' },
-    skeptic: { name: 'Steel Fist', icon: '👊' },
-    mediator: { name: 'Candy Slam', icon: '⚡' },
+    enabler: { name: 'The Bulldozer', icon: 'B' },
+    skeptic: { name: 'Steel Fist', icon: 'S' },
+    mediator: { name: 'Candy Slam', icon: 'C' },
   },
 };
 
