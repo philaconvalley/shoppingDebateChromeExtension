@@ -1,366 +1,526 @@
-// Content Script - Debate Modal and Message Handling
-import { isCheckoutPage, extractProductContext } from './checkout.js';
-import { initializeTheme, getCharacterConfig, getCurrentTheme, THEMES, getThemeConfig } from '../themes/theme-switcher.js';
+// Content Script - Main Orchestrator
 
-let debateModal = null;
+import { isCheckoutPage, extractProductContext } from './checkout.js';
+import { getPriceThreshold } from '../shared/storage.js';
+import { MESSAGE_TYPES, PERSONALITIES, TOAST_TYPES, DEFAULT_PRICE_THRESHOLD, AUDIO_MESSAGE_TYPES } from '../shared/constants.js';
+import { extractPriceValue } from './utils/price.js';
+import { trackSavings, updateSavingsDisplay } from './services/savings.js';
+import { createReminder } from './services/reminders.js';
+import { showToast } from './ui/toast.js';
+import {
+  createDebateModal,
+  showDebateModal,
+  closeDebateModal,
+  getDebateModal,
+  updatePersonalityStatus,
+  appendPersonalityChunk,
+  clearPersonalityResponse,
+  updatePriceDisplay,
+  attachCloseHandler,
+  attachRemindHandler,
+  attachReconsiderHandler,
+  attachProceedHandler
+} from './ui/modal.js';
+import { initializeTheme, getCharacterConfig, getCurrentTheme, THEMES } from '../themes/theme-switcher.js';
+
+// Application state
 let isDebateActive = false;
-let currentProduct = null; // Store current product for reminders/tracking
+let currentProduct = null;
 let currentTheme = THEMES.DEFAULT;
 
-// Create the debate character UI (theme-aware)
-async function createDebateModal() {
-  if (debateModal) return debateModal;
+// Audio playback queue system
+const audioQueue = [];
+let isPlayingAudio = false;
+let currentAudio = null;
+let currentSentenceIndex = {};  // Track sentence index per personality
+let audioEnabled = false;  // Track if user has enabled audio
+let autoplayBlocked = false;  // Track if autoplay was blocked
 
-  // Get current theme and character config
-  currentTheme = await getCurrentTheme();
-  const enablerChar = getCharacterConfig(currentTheme, 'enabler');
-  const skepticChar = getCharacterConfig(currentTheme, 'skeptic');
-  const mediatorChar = getCharacterConfig(currentTheme, 'mediator');
+// Text buffering - store text until audio is ready
+const textBuffer = {
+  enabler: '',
+  skeptic: '',
+  mediator: ''
+};
 
-  const modal = document.createElement('div');
-  modal.id = 'shopping-debate-characters';
-  modal.innerHTML = `
-    <!-- Price Header -->
-    <div class="debate-price-header">
-      <div class="price-label">You're considering:</div>
-      <div class="price-amount">--</div>
-    </div>
+/**
+ * Add audio to queue and start playback if not already playing
+ * @param {string} personality - Personality name
+ * @param {string} audioData - Base64 encoded audio data
+ * @param {string} sentence - The sentence text being spoken
+ */
+function enqueueAudio(personality, audioData, sentence) {
+  audioQueue.push({ personality, audioData, sentence });
+  console.log(`[Audio Queue] Added audio for ${personality}. Queue length: ${audioQueue.length}`);
 
-    <!-- Enabler Character -->
-    <div class="debate-character enabler-character">
-      <div class="character-avatar">
-        <div class="avatar-icon">${enablerChar.icon}</div>
-        <div class="avatar-pulse"></div>
-      </div>
-      <div class="speech-bubble">
-        <div class="bubble-header">
-          <span class="bubble-name">${enablerChar.name}</span>
-          <span class="bubble-status">...</span>
-        </div>
-        <div class="bubble-content"></div>
-      </div>
-    </div>
-
-    <!-- Skeptic Character -->
-    <div class="debate-character skeptic-character">
-      <div class="character-avatar">
-        <div class="avatar-icon">${skepticChar.icon}</div>
-        <div class="avatar-pulse"></div>
-      </div>
-      <div class="speech-bubble">
-        <div class="bubble-header">
-          <span class="bubble-name">${skepticChar.name}</span>
-          <span class="bubble-status">...</span>
-        </div>
-        <div class="bubble-content"></div>
-      </div>
-    </div>
-
-    <!-- Mediator Character -->
-    <div class="debate-character mediator-character">
-      <div class="character-avatar">
-        <div class="avatar-icon">${mediatorChar.icon}</div>
-        <div class="avatar-pulse"></div>
-      </div>
-      <div class="speech-bubble">
-        <div class="bubble-header">
-          <span class="bubble-name">${mediatorChar.name}</span>
-          <span class="bubble-status">...</span>
-        </div>
-        <div class="bubble-content"></div>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="debate-actions">
-      <button class="action-btn remind-btn">Remind Me Later</button>
-      <button class="action-btn reconsider-btn">I'll Reconsider</button>
-      <button class="action-btn proceed-btn">${currentTheme === THEMES.REGINA ? "That's So Fetch! 💖" : "Proceed to Purchase"}</button>
-    </div>
-
-    <!-- Savings Tracker -->
-    <div class="savings-tracker">
-      <div class="savings-label">${currentTheme === THEMES.REGINA ? "This Month's Wins 👑" : "This Month"}</div>
-      <div class="savings-stats">
-        <div class="stat-item">
-          <span class="stat-value" id="saved-amount">$0</span>
-          <span class="stat-label">Saved</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="reconsidered-count">0</span>
-          <span class="stat-label">Reconsidered</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sound Toggle -->
-    <div class="sound-toggle">
-      <button id="sound-toggle-btn">🔊</button>
-    </div>
-
-    <!-- Close Button -->
-    <button class="debate-close-btn">&times;</button>
-  `;
-
-  document.body.appendChild(modal);
-
-  // Add event listeners
-  modal.querySelector('.debate-close-btn').addEventListener('click', closeDebateModal);
-  modal.querySelector('.remind-btn').addEventListener('click', handleRemindLater);
-  modal.querySelector('.reconsider-btn').addEventListener('click', handleReconsider);
-  modal.querySelector('.proceed-btn').addEventListener('click', handleProceed);
-
-  const soundToggleBtn = modal.querySelector('#sound-toggle-btn');
-  soundToggleBtn.addEventListener('click', toggleSound);
-
-  debateModal = modal;
-  return modal;
+  // Start playback if not already playing
+  if (!isPlayingAudio) {
+    playNextAudio();
+  }
 }
 
-// Handle Remind Me Later
+/**
+ * Play the next audio in the queue
+ */
+function playNextAudio() {
+  if (audioQueue.length === 0) {
+    isPlayingAudio = false;
+    console.log('[Audio Queue] Queue empty, stopping playback');
+    return;
+  }
+
+  isPlayingAudio = true;
+  const { personality, audioData, sentence } = audioQueue.shift();
+
+  console.log(`[Audio Queue] Playing audio for ${personality}. Remaining: ${audioQueue.length}`);
+  console.log(`[Audio Queue] Sentence: "${sentence?.substring(0, 50)}..."`);
+
+  // Create audio element
+  currentAudio = new Audio(audioData);
+
+  // Add visual "speaking" indicator
+  const character = document.querySelector(`.${personality}-character`);
+  if (character) {
+    character.classList.add('speaking');
+    console.log(`[Audio] Added speaking indicator for ${personality}`);
+  }
+
+  // Update status
+  updatePersonalityStatus(personality, 'Speaking...');
+
+  // When audio metadata is loaded, start word-by-word highlighting
+  currentAudio.addEventListener('loadedmetadata', () => {
+    const duration = currentAudio.duration;
+    if (sentence && duration > 0) {
+      highlightWordsInSync(personality, sentence, duration);
+    }
+  });
+
+  // Handle audio completion
+  currentAudio.addEventListener('ended', () => {
+    console.log(`[Audio] Finished playing ${personality}`);
+
+    // Remove speaking indicator
+    if (character) {
+      character.classList.remove('speaking');
+    }
+
+    // Remove all word highlights
+    removeAllWordHighlights(personality);
+
+    // Play next audio in queue
+    playNextAudio();
+  });
+
+  // Handle audio errors
+  currentAudio.addEventListener('error', (error) => {
+    console.error(`[Audio] Playback error for ${personality}:`, error);
+
+    // Remove speaking indicator
+    if (character) {
+      character.classList.remove('speaking');
+    }
+
+    // Remove all word highlights
+    removeAllWordHighlights(personality);
+
+    // Continue to next audio
+    playNextAudio();
+  });
+
+  // Start playback
+  currentAudio.play().catch(error => {
+    console.error(`[Audio] Failed to play audio for ${personality}:`, error);
+
+    // Check if this is an autoplay policy error
+    if (!audioEnabled && !autoplayBlocked) {
+      autoplayBlocked = true;
+      showEnableAudioPrompt();
+      console.log('[Audio] Autoplay blocked by browser. Showing enable button.');
+      // Put the audio back in queue for retry after user enables
+      audioQueue.unshift({ personality, audioData, sentence });
+      isPlayingAudio = false;
+      return;
+    }
+
+    // Remove speaking indicator
+    if (character) {
+      character.classList.remove('speaking');
+    }
+
+    // Remove all word highlights
+    removeAllWordHighlights(personality);
+
+    // Continue to next audio
+    playNextAudio();
+  });
+}
+
+/**
+ * Highlight words in sync with audio playback (karaoke style)
+ * @param {string} personality - Personality name
+ * @param {string} sentence - Sentence text to highlight
+ * @param {number} duration - Audio duration in seconds
+ */
+function highlightWordsInSync(personality, sentence, duration) {
+  const character = document.querySelector(`.${personality}-character`);
+  if (!character) return;
+
+  const contentElement = character.querySelector('.bubble-content');
+  if (!contentElement) return;
+
+  // Split sentence into words
+  const words = sentence.trim().split(/\s+/);
+  const timePerWord = duration / words.length; // Time per word in seconds
+
+  console.log(`[Karaoke] Highlighting ${words.length} words over ${duration.toFixed(2)}s (${(timePerWord * 1000).toFixed(0)}ms per word)`);
+
+  // Find where this sentence appears in the content
+  const contentText = contentElement.textContent;
+  const sentenceStart = contentText.indexOf(sentence);
+
+  if (sentenceStart === -1) {
+    console.warn('[Karaoke] Could not find sentence in content');
+    return;
+  }
+
+  // Convert plain text to word spans for highlighting
+  const beforeSentence = contentText.substring(0, sentenceStart);
+  const afterSentence = contentText.substring(sentenceStart + sentence.length);
+
+  // Create word spans
+  const wordSpans = words.map((word, index) => {
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.setAttribute('data-word-index', index);
+    span.textContent = word;
+    return span;
+  });
+
+  // Rebuild content with word spans
+  contentElement.innerHTML = '';
+  if (beforeSentence) {
+    contentElement.appendChild(document.createTextNode(beforeSentence));
+  }
+
+  wordSpans.forEach((span, index) => {
+    contentElement.appendChild(span);
+    if (index < wordSpans.length - 1) {
+      contentElement.appendChild(document.createTextNode(' '));
+    }
+  });
+
+  if (afterSentence) {
+    contentElement.appendChild(document.createTextNode(afterSentence));
+  }
+
+  // Highlight words progressively
+  let currentWordIndex = 0;
+  const highlightInterval = setInterval(() => {
+    if (currentWordIndex > 0) {
+      // Remove highlight from previous word
+      const prevWord = contentElement.querySelector(`[data-word-index="${currentWordIndex - 1}"]`);
+      if (prevWord) {
+        prevWord.classList.remove('word-highlight');
+      }
+    }
+
+    if (currentWordIndex < words.length) {
+      // Highlight current word
+      const currentWord = contentElement.querySelector(`[data-word-index="${currentWordIndex}"]`);
+      if (currentWord) {
+        currentWord.classList.add('word-highlight');
+        currentWord.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      currentWordIndex++;
+    } else {
+      // All words highlighted, stop
+      clearInterval(highlightInterval);
+    }
+  }, timePerWord * 1000);
+
+  // Store interval ID for cleanup
+  contentElement.setAttribute('data-highlight-interval', highlightInterval);
+}
+
+/**
+ * Remove all word highlights for a personality
+ * @param {string} personality - Personality name
+ */
+function removeAllWordHighlights(personality) {
+  const character = document.querySelector(`.${personality}-character`);
+  if (!character) return;
+
+  const contentElement = character.querySelector('.bubble-content');
+  if (!contentElement) return;
+
+  // Clear any active highlight interval
+  const intervalId = contentElement.getAttribute('data-highlight-interval');
+  if (intervalId) {
+    clearInterval(parseInt(intervalId));
+    contentElement.removeAttribute('data-highlight-interval');
+  }
+
+  // Remove all word highlight classes
+  const highlightedWords = contentElement.querySelectorAll('.word-highlight');
+  highlightedWords.forEach(word => {
+    word.classList.remove('word-highlight');
+  });
+
+  // Convert word spans back to plain text
+  const wordSpans = contentElement.querySelectorAll('.word');
+  wordSpans.forEach(span => {
+    const textNode = document.createTextNode(span.textContent);
+    span.replaceWith(textNode);
+  });
+
+  console.log(`[Karaoke] Cleared word highlights for ${personality}`);
+}
+
+/**
+ * Show the enable audio prompt when autoplay is blocked
+ */
+function showEnableAudioPrompt() {
+  const modal = getDebateModal();
+  if (!modal) return;
+
+  const prompt = modal.querySelector('.audio-enable-prompt');
+  if (prompt) {
+    prompt.style.display = 'block';
+
+    // Attach click handler to enable button
+    const enableBtn = prompt.querySelector('.enable-audio-btn');
+    if (enableBtn && !enableBtn.hasAttribute('data-handler-attached')) {
+      enableBtn.setAttribute('data-handler-attached', 'true');
+      enableBtn.addEventListener('click', handleEnableAudio);
+    }
+  }
+}
+
+/**
+ * Hide the enable audio prompt
+ */
+function hideEnableAudioPrompt() {
+  const modal = getDebateModal();
+  if (!modal) return;
+
+  const prompt = modal.querySelector('.audio-enable-prompt');
+  if (prompt) {
+    prompt.style.display = 'none';
+  }
+}
+
+/**
+ * Handle enable audio button click
+ */
+function handleEnableAudio() {
+  console.log('[Audio] User enabled audio playback');
+  audioEnabled = true;
+  hideEnableAudioPrompt();
+
+  // Resume audio playback from queue
+  if (audioQueue.length > 0 && !isPlayingAudio) {
+    playNextAudio();
+  }
+}
+
+/**
+ * Escape HTML to prevent XSS
+ * @param {string} text - Text to escape
+ * @returns {string} - Escaped text
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * Stop all audio playback and clear queue
+ */
+function stopAllAudio() {
+  // Stop current audio
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  // Clear queue
+  audioQueue.length = 0;
+  isPlayingAudio = false;
+
+  // Remove all speaking indicators
+  [PERSONALITIES.ENABLER, PERSONALITIES.SKEPTIC, PERSONALITIES.MEDIATOR].forEach(p => {
+    const character = document.querySelector(`.${p}-character`);
+    if (character) {
+      character.classList.remove('speaking');
+    }
+  });
+
+  console.log('[Audio] Stopped all audio and cleared queue');
+}
+
+/**
+ * Handle Remind Me Later button click
+ */
 async function handleRemindLater() {
   if (!currentProduct) return;
 
-  // Save reminder with 3-day timestamp
-  const reminder = {
-    product: currentProduct,
-    remindAt: Date.now() + (3 * 24 * 60 * 60 * 1000), // 3 days
-    url: window.location.href
-  };
-
-  const { reminders = [] } = await chrome.storage.local.get(['reminders']);
-  reminders.push(reminder);
-  await chrome.storage.local.set({ reminders });
-
-  alert('Reminder set for 3 days from now!');
+  await createReminder(currentProduct, window.location.href);
+  showToast('Reminder set for 3 days from now!', TOAST_TYPES.INFO);
   closeDebateModal();
 }
 
-// Handle Reconsider (tracks savings)
+/**
+ * Handle Reconsider button click
+ */
 async function handleReconsider() {
   if (!currentProduct) return;
 
   await trackSavings(currentProduct.price);
-  alert(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`);
+  showToast(`Great decision! You saved ${currentProduct.price || 'money'} by reconsidering.`, TOAST_TYPES.SUCCESS);
   closeDebateModal();
 }
 
-// Handle Proceed to Purchase
+/**
+ * Handle Proceed to Purchase button click
+ */
 function handleProceed() {
   closeDebateModal();
 }
 
-// Track savings when user reconsiders
-async function trackSavings(priceString) {
-  const price = extractPriceValue(priceString);
-  if (price <= 0) return;
-
-  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const { savings = {} } = await chrome.storage.local.get(['savings']);
-
-  if (!savings[currentMonth]) {
-    savings[currentMonth] = { amount: 0, count: 0 };
-  }
-
-  savings[currentMonth].amount += price;
-  savings[currentMonth].count += 1;
-
-  await chrome.storage.local.set({ savings });
-  updateSavingsDisplay();
+/**
+ * Handle close button click
+ */
+function handleClose() {
+  stopAllAudio();
+  closeDebateModal();
+  isDebateActive = false;
 }
 
-// Extract numeric price from string
-function extractPriceValue(priceString) {
-  if (!priceString) return 0;
-  const match = priceString.match(/[\d,]+\.?\d*/);
-  if (!match) return 0;
-  return parseFloat(match[0].replace(/,/g, ''));
-}
-
-// Update savings display
-async function updateSavingsDisplay() {
-  if (!debateModal) return;
-
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const { savings = {} } = await chrome.storage.local.get(['savings']);
-  const monthData = savings[currentMonth] || { amount: 0, count: 0 };
-
-  const amountEl = debateModal.querySelector('#saved-amount');
-  const countEl = debateModal.querySelector('#reconsidered-count');
-
-  if (amountEl) amountEl.textContent = `$${monthData.amount.toFixed(0)}`;
-  if (countEl) countEl.textContent = monthData.count;
-}
-
-// Update price display
-function updatePriceDisplay(price) {
-  if (!debateModal) return;
-
-  const priceEl = debateModal.querySelector('.price-amount');
-  if (priceEl) {
-    priceEl.textContent = price || 'Price not detected';
-  }
-}
-
-// Show the debate characters
-async function showDebateModal() {
-  // Initialize theme and wait for stylesheet injection
-  currentTheme = await initializeTheme();
-  
-  // Create modal with current theme applied
-  const modal = await createDebateModal();
-  modal.classList.add('active');
-}
-
-// Close the debate characters
-function closeDebateModal() {
-  if (debateModal) {
-    debateModal.classList.remove('active');
-    setTimeout(() => {
-      debateModal.remove();
-      debateModal = null;
-    }, 300); // Wait for slide-out animation
-    isDebateActive = false;
-  }
-}
-
-// Update personality status
-function updatePersonalityStatus(personality, status) {
-  const character = debateModal.querySelector(`.${personality}-character`);
-  if (character) {
-    const statusEl = character.querySelector('.bubble-status');
-    statusEl.textContent = status;
-
-    // Add active class when speaking
-    if (status === 'Speaking...') {
-      character.classList.add('speaking');
-
-      // Scroll character into view smoothly
-      character.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-      character.classList.remove('speaking');
-    }
-  }
-}
-
-// Append chunk to personality response
-function appendPersonalityChunk(personality, chunk) {
-  const character = debateModal.querySelector(`.${personality}-character`);
-  if (character) {
-    const bubbleContent = character.querySelector('.bubble-content');
-    bubbleContent.textContent += chunk;
-
-    // Show bubble if first chunk
-    const bubble = character.querySelector('.speech-bubble');
-    if (!bubble.classList.contains('visible')) {
-      bubble.classList.add('visible');
-    }
-
-    // Auto-scroll
-    bubbleContent.scrollTop = bubbleContent.scrollHeight;
-  }
-}
-
-// Clear personality response
-function clearPersonalityResponse(personality) {
-  const character = debateModal.querySelector(`.${personality}-character`);
-  if (character) {
-    const bubbleContent = character.querySelector('.bubble-content');
-    bubbleContent.textContent = '';
-
-    const bubble = character.querySelector('.speech-bubble');
-    bubble.classList.remove('visible');
-  }
-}
-
-// Start the debate
+/**
+ * Start the debate
+ */
 async function startDebate() {
   if (isDebateActive) return;
 
   isDebateActive = true;
-  await showDebateModal();
+  await showDebateModal(currentTheme);
+
+  // Attach event handlers
+  attachCloseHandler(handleClose);
+  attachRemindHandler(handleRemindLater);
+  attachReconsiderHandler(handleReconsider);
+  attachProceedHandler(handleProceed);
 
   // Reset all personalities
-  ['enabler', 'skeptic', 'mediator'].forEach(p => {
+  [PERSONALITIES.ENABLER, PERSONALITIES.SKEPTIC, PERSONALITIES.MEDIATOR].forEach(p => {
     clearPersonalityResponse(p);
     updatePersonalityStatus(p, 'Waiting...');
+    // Clear text buffer
+    textBuffer[p] = '';
   });
 
   // Extract context and send to background
   const productContext = extractProductContext();
 
-  // Extract and store current product info
+  // Store current product info
   currentProduct = {
     url: productContext.url,
-    title: productContext.title,
-    price: productContext.prices?.[0] || 'Price not detected'
+    title: productContext.productName || productContext.title,
+    price: productContext.price || 'Price not detected',
+    brand: productContext.brand
   };
 
   // Update price display
   updatePriceDisplay(currentProduct.price);
 
   // Update savings display
-  updateSavingsDisplay();
+  const modal = getDebateModal();
+  updateSavingsDisplay(modal);
 
+  // Send message to background to start debate
   chrome.runtime.sendMessage({
-    type: 'generateDebateStreaming',
+    type: MESSAGE_TYPES.GENERATE_DEBATE_STREAMING,
     productContext: productContext.formatted
   });
 }
 
-// Listen for messages from background script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'personalityStart') {
-    updatePersonalityStatus(message.personality, 'Thinking...');
-  }
-
-  if (message.type === 'personalityChunk') {
-    appendPersonalityChunk(message.personality, message.chunk);
-    updatePersonalityStatus(message.personality, 'Responding...');
-  }
-
-  if (message.type === 'personalityComplete') {
-    updatePersonalityStatus(message.personality, 'Complete');
-  }
-
-  if (message.type === 'debateComplete') {
-    console.log('Debate complete!');
-  }
-
-  if (message.type === 'debateError') {
-    console.error('Debate error:', message.error);
-    alert(`Error: ${message.error}`);
-    closeDebateModal();
-  }
-
-  if (message.type === 'triggerDebate') {
-    startDebate();
-  }
-});
-
-// Check if price meets threshold
+/**
+ * Check if price meets threshold
+ * @returns {Promise<boolean>}
+ */
 async function shouldTriggerDebate() {
-  const { priceThreshold = 50 } = await chrome.storage.sync.get(['priceThreshold']);
+  const priceThreshold = await getPriceThreshold() ?? DEFAULT_PRICE_THRESHOLD;
 
-  // Extract product context to get price
   const productContext = extractProductContext();
 
-  if (productContext.prices.length === 0) {
-    // No price detected, trigger anyway
-    return true;
+  if (!productContext.price) {
+    return true; // No price detected, trigger anyway
   }
 
-  // Get the first price and extract numeric value
-  const priceString = productContext.prices[0];
-  const priceValue = extractPriceValue(priceString);
+  const priceValue = extractPriceValue(productContext.price);
 
-  // Trigger if price meets or exceeds threshold
   return priceValue >= priceThreshold;
 }
 
-// Auto-trigger on checkout pages with price threshold check
+/**
+ * Listen for messages from background script
+ */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  switch (message.type) {
+    case MESSAGE_TYPES.PERSONALITY_START:
+      // Clear previous response (important for Round 4 when Enabler speaks again)
+      clearPersonalityResponse(message.personality);
+      textBuffer[message.personality] = '';
+      updatePersonalityStatus(message.personality, 'Thinking...');
+      break;
+
+    case MESSAGE_TYPES.PERSONALITY_CHUNK:
+      // Stream text word-by-word as it arrives (karaoke style)
+      appendPersonalityChunk(message.personality, message.chunk);
+      textBuffer[message.personality] += message.chunk;
+      updatePersonalityStatus(message.personality, 'Speaking...');
+      break;
+
+    case MESSAGE_TYPES.PERSONALITY_COMPLETE:
+      updatePersonalityStatus(message.personality, 'Audio ready');
+      break;
+
+    case MESSAGE_TYPES.DEBATE_COMPLETE:
+      console.log('Debate complete!');
+      break;
+
+    case MESSAGE_TYPES.DEBATE_ERROR:
+      console.error('Debate error:', message.error);
+      showToast(`Error: ${message.error}`, TOAST_TYPES.ERROR);
+      closeDebateModal();
+      break;
+
+    case MESSAGE_TYPES.TRIGGER_DEBATE:
+      startDebate();
+      break;
+
+    // Audio message types
+    case AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO:
+      console.log(`[Audio] Received audio for ${message.personality}`);
+      enqueueAudio(message.personality, message.audioData, message.sentence);
+      break;
+
+    case AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO_COMPLETE:
+      console.log(`[Audio] Audio generation complete for ${message.personality}`);
+      break;
+
+    default:
+      break;
+  }
+});
+
+/**
+ * Auto-trigger on product pages with price threshold check
+ */
 if (isCheckoutPage()) {
-  // Wait for page to be fully loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
       if (await shouldTriggerDebate()) {
@@ -378,36 +538,37 @@ if (isCheckoutPage()) {
 
 // Initialize theme on page load
 initializeTheme().then(theme => {
+  currentTheme = theme;
   console.log(`[ShoppingDebate] Content script loaded with theme: ${theme}`);
 });
 
 // Listen for theme changes from popup
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Content] Received message:', message.type);
+
   if (message.type === 'THEME_CHANGED') {
-    console.log(`[ThemeChange] Switching to: ${message.themeId}`);
+    console.log(`[ThemeChange] ✅ Received THEME_CHANGED message`);
+    console.log(`[ThemeChange] Switching from "${currentTheme}" to "${message.themeId}"`);
+
     currentTheme = message.themeId;
-    // Force modal recreation on next open
-    if (debateModal) {
-      debateModal.remove();
-      debateModal = null;
+
+    // Force modal recreation on next open with new theme
+    const modal = getDebateModal();
+    if (modal) {
+      console.log('[ThemeChange] Modal is open, closing it');
+      closeDebateModal();
+    } else {
+      console.log('[ThemeChange] No modal currently open');
     }
-    initializeTheme();
+
+    // Re-initialize theme
+    initializeTheme().then(() => {
+      console.log(`[ThemeChange] Theme initialized to: ${currentTheme}`);
+      sendResponse({ success: true, theme: currentTheme });
+    });
+
+    return true; // Keep message channel open for async response
   }
 });
-
-// Toggle sound
-async function toggleSound() {
-  const { sound = true } = await chrome.storage.sync.get(['sound']);
-  await chrome.storage.sync.set({ sound: !sound });
-  updateSoundToggle();
-}
-
-// Update sound toggle
-async function updateSoundToggle() {
-  if (!debateModal) return;
-  const { sound = true } = await chrome.storage.sync.get(['sound']);
-  const btn = debateModal.querySelector('#sound-toggle-btn');
-  if (btn) btn.textContent = sound ? '🔊' : '🔇';
-}
 
 console.log('Shopping Debate content script loaded');

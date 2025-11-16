@@ -1,11 +1,9 @@
 // Popup Controller
-console.log('[INFO] Shopping Debate popup loaded - API keys embedded from .env');
 
-const DEFAULT_MODELS = {
-  enabler: 'anthropic/claude-3-haiku',
-  skeptic: 'anthropic/claude-3.5-sonnet',
-  mediator: 'anthropic/claude-3-opus'
-};
+import { DEFAULT_MODELS, MESSAGE_TYPES } from '../shared/constants.js';
+import { getSyncStorage, setSyncStorage, getLocalStorage, setLocalStorage } from '../shared/storage.js';
+
+console.log('[INFO] Shopping Debate popup loaded - API keys embedded from .env');
 
 // Theme management
 async function getCurrentTheme() {
@@ -39,31 +37,43 @@ async function initializeThemeToggle() {
     btn.addEventListener('click', async () => {
       const themeId = btn.dataset.theme;
 
+      console.log(`[Popup] Theme button clicked: ${themeId}`);
+
       // Update UI
       document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       // Save theme
       await saveTheme(themeId);
-      console.log(`[Theme] Switched to: ${themeId}`);
+      console.log(`[Popup] Theme saved: ${themeId}`);
 
       // Notify all tabs
       const tabs = await chrome.tabs.query({});
+      console.log(`[Popup] Sending THEME_CHANGED to ${tabs.length} tabs`);
+
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
           type: 'THEME_CHANGED',
           themeId: themeId
-        }).catch(() => {
-          // Ignore errors for tabs without content script
+        }).then(() => {
+          console.log(`[Popup] Message sent to tab ${tab.id}`);
+        }).catch((err) => {
+          console.log(`[Popup] Tab ${tab.id} couldn't receive message (no content script)`);
         });
       });
+
+      // Show visual feedback
+      btn.textContent = btn.textContent + ' ✓';
+      setTimeout(() => {
+        btn.textContent = btn.textContent.replace(' ✓', '');
+      }, 1000);
     });
   });
 }
 
 // Load current model selections
 async function loadModels() {
-  const result = await chrome.storage.sync.get(['models']);
+  const result = await getSyncStorage(['models']);
   const models = result.models || DEFAULT_MODELS;
 
   document.getElementById('quickModelEnabler').value = models.enabler;
@@ -79,7 +89,7 @@ async function saveModelChange() {
     mediator: document.getElementById('quickModelMediator').value
   };
 
-  await chrome.storage.sync.set({ models });
+  await setSyncStorage({ models });
   console.log('[INFO] Models updated:', models);
 }
 
@@ -102,15 +112,72 @@ document.getElementById('testDebate').addEventListener('click', async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   // Send message to content script to trigger debate
-  chrome.tabs.sendMessage(tab.id, { type: 'triggerDebate' });
+  chrome.tabs.sendMessage(tab.id, { type: MESSAGE_TYPES.TRIGGER_DEBATE });
 
   // Close popup
   window.close();
 });
 
+// Load and display reminders
+async function loadReminders() {
+  const reminders = await getLocalStorage(['reminders']).then(result => result.reminders || []);
+  const remindersList = document.getElementById('remindersList');
+
+  if (reminders.length === 0) {
+    remindersList.innerHTML = '<div class="no-reminders">No reminders set</div>';
+    return;
+  }
+
+  remindersList.innerHTML = '';
+
+  reminders.forEach((reminder, index) => {
+    const reminderItem = document.createElement('div');
+    reminderItem.className = 'reminder-item';
+
+    const info = document.createElement('div');
+    info.className = 'reminder-info';
+
+    const price = document.createElement('div');
+    price.className = 'reminder-price';
+    price.textContent = reminder.product?.price || 'Price unknown';
+
+    const title = document.createElement('div');
+    title.className = 'reminder-title';
+    title.textContent = reminder.product?.title || 'Product';
+    title.title = reminder.product?.title || 'Product'; // Tooltip for full title
+
+    const time = document.createElement('div');
+    time.className = 'reminder-time';
+    const daysUntil = Math.ceil((reminder.remindAt - Date.now()) / (1000 * 60 * 60 * 24));
+    time.textContent = daysUntil > 0 ? `Reminder in ${daysUntil} day${daysUntil > 1 ? 's' : ''}` : 'Due now';
+
+    info.appendChild(price);
+    info.appendChild(title);
+    info.appendChild(time);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'reminder-delete';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.addEventListener('click', () => deleteReminder(index));
+
+    reminderItem.appendChild(info);
+    reminderItem.appendChild(deleteBtn);
+    remindersList.appendChild(reminderItem);
+  });
+}
+
+// Delete a specific reminder
+async function deleteReminder(index) {
+  const reminders = await getLocalStorage(['reminders']).then(result => result.reminders || []);
+  reminders.splice(index, 1);
+  await setLocalStorage({ reminders });
+  loadReminders(); // Reload the list
+}
+
 // Initialize popup
 async function initializePopup() {
   await loadModels();
+  await loadReminders();
   await initializeThemeToggle();
 }
 

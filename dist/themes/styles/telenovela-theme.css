@@ -31,10 +31,11 @@
   --isabella-border: #DAA520;
   --isabella-accent: #FFD700;
 
-  /* Neutral & Functional - WCAG Compliant */
-  --text-primary: #1A0000;        /* Deep red-black - 16.2:1 contrast (AAA) */
-  --text-secondary: #4D1A1A;      /* Dark red-brown - 9.1:1 contrast (AAA) */
-  --text-accent: #DC143C;         /* Crimson - for emphasis only */
+  /* Neutral & Functional - WCAG Compliant - DARK MODE */
+  --text-primary: #FFFFFF;        /* White text on dark backgrounds */
+  --text-secondary: #FFC0CB;      /* Soft pink for secondary text */
+  --text-accent: #FFD1DC;         /* Light pink - for emphasis */
+  --dialogue-bg: #3B1A21;         /* Wine red background - WCAG AAA compliant */
   --white-soft: #FFF5F5;
   --shadow-red: rgba(139, 0, 0, 0.2);
   --shadow-gold: rgba(218, 165, 32, 0.2);
@@ -66,20 +67,20 @@
    ============================================ */
 
 [data-theme="telenovela"] #shopping-debate-characters {
+  /* SIDEBAR LAYOUT - RIGHT ANCHORED (inherits from base CSS) */
   background: linear-gradient(180deg,
     #2D0A0A 0%,
     #1A0000 50%,
     #0D0000 100%
   );
   border: 3px solid var(--telenovela-gold);
-  border-radius: 24px;
+  border-radius: 24px 0 0 24px;
   box-shadow:
     0 24px 48px var(--shadow-red),
     0 0 40px var(--candlelight-soft),
     0 0 0 1px rgba(218, 165, 32, 0.3) inset;
   padding: 20px;
   backdrop-filter: blur(10px);
-  position: relative;
   overflow: hidden;
 }
 
@@ -317,7 +318,7 @@
    ============================================ */
 
 [data-theme="telenovela"] .speech-bubble {
-  background: var(--white-soft);
+  background: var(--dialogue-bg);
   border: 2px solid transparent;
   box-shadow:
     0 4px 16px var(--shadow-red),
@@ -329,19 +330,19 @@
 /* Valentina's bubble */
 [data-theme="telenovela"] .enabler-character .speech-bubble {
   border-color: var(--valentina-border);
-  background: linear-gradient(135deg, #FFF5F5 0%, #FFE4E4 100%);
+  background: linear-gradient(135deg, #3B1A21 0%, #4D1F2A 100%);
 }
 
 /* Alejandro's bubble */
 [data-theme="telenovela"] .skeptic-character .speech-bubble {
   border-color: var(--alejandro-border);
-  background: linear-gradient(135deg, #F5F5FF 0%, #E8E4FF 100%);
+  background: linear-gradient(135deg, #3B1A21 0%, #2E1640 100%);
 }
 
 /* Isabella's bubble */
 [data-theme="telenovela"] .mediator-character .speech-bubble {
   border-color: var(--isabella-border);
-  background: linear-gradient(135deg, #FFFEF5 0%, #FFF8DC 100%);
+  background: linear-gradient(135deg, #3B1A21 0%, #4D2F1A 100%);
 }
 
 
@@ -383,8 +384,8 @@
   letter-spacing: 0.5px;
   padding: 3px 8px;
   border-radius: 10px;
-  background: rgba(139, 0, 0, 0.1);
-  color: var(--text-primary);
+  background: rgba(220, 20, 60, 0.2);
+  color: var(--text-secondary);
   box-shadow: 0 0 8px var(--candlelight-soft);
 }
 
@@ -405,7 +406,7 @@
 /* Emphasis with candlelight glow */
 [data-theme="telenovela"] .bubble-content strong,
 [data-theme="telenovela"] .bubble-content em {
-  color: var(--text-primary);
+  color: var(--text-accent);
   text-shadow: 0 0 8px var(--candlelight-soft);
   font-weight: 700;
   font-style: normal;

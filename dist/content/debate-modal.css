@@ -289,13 +289,21 @@
   background: #9ca3af;
 }
 
-/* Price Header */
+/* Price Header with Savings */
 .debate-price-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
   padding: 12px 16px;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   animation: priceAppear 0.4s ease-out both;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.price-section {
+  flex: 1;
 }
 
 .price-label {
@@ -310,6 +318,44 @@
   font-size: 20px;
   font-weight: 700;
   color: white;
+}
+
+.savings-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.savings-section .savings-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.savings-section .savings-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.savings-section .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.savings-section .stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+}
+
+.savings-section .stat-label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 @keyframes priceAppear {
@@ -389,59 +435,45 @@
   }
 }
 
-/* Savings Tracker */
-.savings-tracker {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+/* Toast Notification */
+.debate-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: white;
+  padding: 16px 24px;
   border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  animation: savingsAppear 0.5s ease-out both;
-  animation-delay: 0.5s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  z-index: 2147483649;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  min-width: 300px;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.savings-label {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
+.debate-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
-.savings-stats {
-  display: flex;
-  justify-content: space-around;
-  gap: 16px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 700;
+.debate-toast.success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  margin-bottom: 2px;
 }
 
-.stat-label {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.debate-toast.info {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
 }
 
-@keyframes savingsAppear {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.debate-toast.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
 }
 
 /* Responsive Design */
@@ -460,17 +492,33 @@
     max-height: 120px;
   }
 
+  .debate-price-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
   .price-amount {
     font-size: 18px;
+  }
+
+  .savings-section {
+    align-self: stretch;
+    align-items: flex-start;
+  }
+
+  .savings-section .savings-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .savings-section .stat-value {
+    font-size: 14px;
   }
 
   .action-btn {
     padding: 8px 12px;
     font-size: 12px;
-  }
-
-  .stat-value {
-    font-size: 16px;
   }
 }
 
@@ -499,5 +547,79 @@
 
   .bubble-content {
     font-size: 12px;
+  }
+}
+
+/* Karaoke-style word highlighting */
+.word {
+  transition: all 0.2s ease;
+  display: inline;
+}
+
+.word-highlight {
+  background: linear-gradient(120deg, rgba(255, 255, 100, 0.4) 0%, rgba(255, 200, 100, 0.5) 100%);
+  color: #000;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(255, 200, 0, 0.3);
+  animation: wordPulse 0.3s ease;
+}
+
+@keyframes wordPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Enable Audio Prompt */
+.audio-enable-prompt {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin: 16px 0;
+  animation: slideIn 0.3s ease-out;
+}
+
+.enable-audio-btn {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+
+.enable-audio-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.audio-help-text {
+  color: white;
+  font-size: 13px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

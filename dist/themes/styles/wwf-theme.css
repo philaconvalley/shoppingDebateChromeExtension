@@ -40,7 +40,8 @@
   /* Neutral & Functional - WCAG Compliant */
   --text-primary: #FFFFFF;        /* White on dark - 21:1 contrast (AAA) */
   --text-secondary: #FFD700;      /* Gold - 10.4:1 contrast (AAA) */
-  --text-accent: #00FF00;         /* Neon green - for emphasis */
+  --text-accent: #FF4040;         /* Red accent - for emphasis */
+  --dialogue-bg: #1A1A1A;         /* Dark gray background - WCAG AAA compliant */
   --text-dark: #000000;
   --shadow-gold: rgba(255, 215, 0, 0.4);
   --shadow-neon: rgba(0, 255, 0, 0.3);
@@ -66,20 +67,20 @@
    ============================================ */
 
 [data-theme="wwf"] #shopping-debate-characters {
+  /* SIDEBAR LAYOUT - RIGHT ANCHORED (inherits from base CSS) */
   background: linear-gradient(180deg,
     #0D0D0D 0%,
     #000000 50%,
     #1A1A1A 100%
   );
   border: 4px solid var(--wwf-gold);
-  border-radius: 16px;
+  border-radius: 16px 0 0 16px;
   box-shadow:
     0 24px 48px rgba(0, 0, 0, 0.8),
     0 0 40px var(--shadow-gold),
     0 0 80px var(--shadow-neon),
     0 0 0 2px var(--ring-black) inset;
   padding: 20px;
-  position: relative;
   overflow: hidden;
 }
 
@@ -379,7 +380,7 @@
    ============================================ */
 
 [data-theme="wwf"] .speech-bubble {
-  background: rgba(0, 0, 0, 0.9);
+  background: var(--dialogue-bg);
   border: 3px solid transparent;
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.8),
@@ -392,8 +393,8 @@
 [data-theme="wwf"] .enabler-character .speech-bubble {
   border-color: var(--bulldozer-border);
   background: linear-gradient(135deg,
-    rgba(139, 0, 0, 0.95) 0%,
-    rgba(0, 0, 0, 0.98) 100%
+    #1A1A1A 0%,
+    #2D0A0A 100%
   );
 }
 
@@ -401,8 +402,8 @@
 [data-theme="wwf"] .skeptic-character .speech-bubble {
   border-color: var(--steelfist-border);
   background: linear-gradient(135deg,
-    rgba(0, 0, 139, 0.95) 0%,
-    rgba(0, 0, 0, 0.98) 100%
+    #1A1A1A 0%,
+    #0A0A2D 100%
   );
 }
 
@@ -410,8 +411,8 @@
 [data-theme="wwf"] .mediator-character .speech-bubble {
   border-color: var(--candyslam-border);
   background: linear-gradient(135deg,
-    rgba(139, 0, 139, 0.95) 0%,
-    rgba(0, 0, 0, 0.98) 100%
+    #1A1A1A 0%,
+    #2D0A2D 100%
   );
 }
 

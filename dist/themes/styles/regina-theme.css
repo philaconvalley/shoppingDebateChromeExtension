@@ -32,10 +32,11 @@
   --karen-border: #FFC0CB;
   --karen-accent: #FFB6C1;
 
-  /* Neutral & Functional - WCAG AA/AAA Compliant */
-  --text-primary: #2D1B2E;        /* Deep purple-black - 12.6:1 contrast (AAA) */
-  --text-secondary: #6B4C6D;      /* Muted purple-gray - 6.8:1 contrast (AA+) */
-  --text-accent: #FF69B4;         /* Hot pink - USE ONLY FOR EMPHASIS */
+  /* Neutral & Functional - WCAG AA/AAA Compliant - DARK MODE */
+  --text-primary: #FFFFFF;         /* White text on dark backgrounds */
+  --text-secondary: #FFB6D9;       /* Light pink for secondary text */
+  --text-accent: #FF69B4;          /* Hot pink - USE ONLY FOR EMPHASIS */
+  --dialogue-bg: #2D1B2E;          /* Deep purple-black background - WCAG AAA compliant */
   --white-glossy: #FFFFFF;
   --shadow-pink: rgba(255, 20, 147, 0.15);
   --shadow-pink-strong: rgba(255, 20, 147, 0.3);
@@ -69,12 +70,22 @@
    ============================================ */
 
 [data-theme="regina"] #shopping-debate-characters {
+  /* SIDEBAR LAYOUT - RIGHT ANCHORED */
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 360px;
+  max-width: 100vw;
+  z-index: 9999;
+
+  /* REGINA STYLING */
   background: linear-gradient(180deg,
     var(--regina-pink-light) 0%,
     rgba(255, 255, 255, 0.95) 100%
   );
   border: 3px solid var(--regina-pink-medium);
-  border-radius: 24px;
+  border-radius: 24px 0 0 24px;
   box-shadow:
     0 24px 48px var(--shadow-pink-strong),
     0 0 0 1px rgba(255, 255, 255, 0.5) inset;
@@ -312,7 +323,7 @@
    ============================================ */
 
 [data-theme="regina"] .speech-bubble {
-  background: white;
+  background: var(--dialogue-bg);
   border: 2px solid transparent;
   box-shadow: 0 4px 16px var(--shadow-pink);
   border-radius: 18px;
@@ -322,31 +333,31 @@
 /* Regina's speech bubble */
 [data-theme="regina"] .enabler-character .speech-bubble {
   border-color: var(--regina-pink-medium);
-  background: linear-gradient(135deg, #FFFFFF 0%, #FFF5FA 100%);
+  background: linear-gradient(135deg, #2D1B2E 0%, #3D2B3E 100%);
 }
 
 [data-theme="regina"] .enabler-character .speech-bubble::before {
-  border-right-color: var(--regina-pink-medium);
+  border-right-color: #2D1B2E;
 }
 
 /* Gretchen's speech bubble */
 [data-theme="regina"] .skeptic-character .speech-bubble {
   border-color: var(--gretchen-border);
-  background: linear-gradient(135deg, #FFFFFF 0%, #F9F5FF 100%);
+  background: linear-gradient(135deg, #2D1B2E 0%, #352440 100%);
 }
 
 [data-theme="regina"] .skeptic-character .speech-bubble::before {
-  border-right-color: var(--gretchen-border);
+  border-right-color: #2D1B2E;
 }
 
 /* Karen's speech bubble */
 [data-theme="regina"] .mediator-character .speech-bubble {
   border-color: var(--karen-border);
-  background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%);
+  background: linear-gradient(135deg, #2D1B2E 0%, #3D2633 100%);
 }
 
 [data-theme="regina"] .mediator-character .speech-bubble::before {
-  border-right-color: var(--karen-border);
+  border-right-color: #2D1B2E;
 }
 
 
@@ -355,7 +366,7 @@
    ============================================ */
 
 [data-theme="regina"] .bubble-header {
-  border-bottom-color: var(--regina-pink-light);
+  border-bottom-color: rgba(255, 182, 217, 0.3);
 }
 
 [data-theme="regina"] .bubble-name {
@@ -366,27 +377,27 @@
 }
 
 [data-theme="regina"] .enabler-character .bubble-name {
-  color: var(--text-primary);  /* High contrast base text */
+  color: var(--text-primary);  /* White text */
   /* Add pink glow for Regina's royal flair */
   text-shadow:
-    0 0 10px rgba(255, 105, 180, 0.6),
-    0 2px 4px rgba(255, 20, 147, 0.3);
+    0 0 10px rgba(255, 105, 180, 0.8),
+    0 2px 4px rgba(255, 20, 147, 0.5);
   /* Optional: Add subtle gradient underline instead */
   border-bottom: 3px solid transparent;
   border-image: var(--regina-primary) 1;
 }
 
 [data-theme="regina"] .skeptic-character .bubble-name {
-  color: var(--text-primary);  /* High contrast base */
+  color: var(--text-primary);  /* White text */
   /* Purple glow for Gretchen */
-  text-shadow: 0 0 8px rgba(186, 85, 211, 0.5);
+  text-shadow: 0 0 8px rgba(186, 85, 211, 0.7);
   border-bottom: 3px solid var(--gretchen-border);
 }
 
 [data-theme="regina"] .mediator-character .bubble-name {
-  color: var(--text-primary);  /* High contrast base */
+  color: var(--text-primary);  /* White text */
   /* Soft pink glow for Karen */
-  text-shadow: 0 0 8px rgba(255, 192, 203, 0.5);
+  text-shadow: 0 0 8px rgba(255, 192, 203, 0.7);
   border-bottom: 3px solid var(--karen-border);
 }
 
@@ -397,9 +408,9 @@
   letter-spacing: 0.5px;
   padding: 3px 8px;
   border-radius: 10px;
-  background: var(--regina-pink-light);
-  color: var(--text-primary);  /* High contrast: 12.6:1 ✅ */
-  /* Add pink glow for style without sacrificing readability */
+  background: rgba(255, 105, 180, 0.2);
+  color: var(--text-secondary);  /* Light pink text */
+  /* Add pink glow for style */
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.3);
 }
 
@@ -411,16 +422,16 @@
 [data-theme="regina"] .bubble-content {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--text-primary);  /* #2D1B2E - High contrast (12.6:1) ✅ */
+  color: var(--text-primary);  /* White - High contrast (16.6:1) ✅ */
   font-family: var(--font-body);
-  font-weight: 500;  /* Slightly bolder for better readability */
+  font-weight: 400;  /* Normal weight on dark background */
 }
 
 /* Optional: Pink accent for emphasis words */
 [data-theme="regina"] .bubble-content strong,
 [data-theme="regina"] .bubble-content em {
-  color: var(--text-primary);
-  text-shadow: 0 0 8px rgba(255, 105, 180, 0.4);  /* Pink glow on emphasis */
+  color: var(--text-accent);  /* Hot pink for emphasis */
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.6);  /* Pink glow on emphasis */
   font-weight: 700;
 }
 
