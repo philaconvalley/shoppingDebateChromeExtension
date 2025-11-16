@@ -1,12 +1,11 @@
 // OpenRouter API Client
 
-import { OpenRouter } from '@openrouter/sdk';
 import { generateSpeech, extractCompleteSentences } from '../services/audio.js';
 import { AUDIO_MESSAGE_TYPES } from '../../shared/constants.js';
 import { getSyncStorage } from '../../shared/storage.js';
 
 /**
- * Stream a single personality's response using OpenRouter SDK
+ * Stream a single personality's response using OpenRouter API
  * @param {string} prompt - Prompt for the AI
  * @param {string} model - Model ID to use
  * @param {string} apiKey - API key for authentication
@@ -15,26 +14,27 @@ import { getSyncStorage } from '../../shared/storage.js';
  * @returns {Promise<string>} - Full response text
  */
 export async function streamPersonality(prompt, model, apiKey, tabId, personalityName) {
-  const client = new OpenRouter({
-    apiKey: apiKey,
-    defaultHeaders: {
-      'HTTP-Referer': 'https://shopping-debate.extension',
-      'X-Title': 'Shopping Debate'
-    }
-  });
-
   let fullResponse = '';
   let sentenceBuffer = '';
 
-  // Load voice settings
+  // Load voice settings and theme
   const settings = await getSyncStorage(['enableVoice', 'voiceSpeed', 'elevenlabsApiKey']);
   const enableVoice = settings.enableVoice !== undefined ? settings.enableVoice : true;
   const voiceSpeed = settings.voiceSpeed !== undefined ? settings.voiceSpeed : 1.0;
   const elevenlabsApiKey = settings.elevenlabsApiKey || null;
 
+  // Get current theme from local storage
+  const themeResult = await new Promise(resolve => {
+    chrome.storage.local.get(['theme'], (result) => {
+      resolve(result.theme || 'default');
+    });
+  });
+  const currentTheme = themeResult;
+
   console.log(`[Audio Pipeline] Voice settings loaded for ${personalityName}:`, {
     enableVoice,
     voiceSpeed,
+    theme: currentTheme,
     hasApiKey: !!elevenlabsApiKey,
     apiKeySource: elevenlabsApiKey ? 'user-settings' : 'environment'
   });
@@ -46,55 +46,97 @@ export async function streamPersonality(prompt, model, apiKey, tabId, personalit
   });
 
   try {
-    const stream = await client.chat.send({
-      model: model,
-      messages: [{ role: 'user', content: prompt }],
-      stream: true,
-      maxTokens: 300
+    console.log(`[OpenRouter] Starting stream for ${personalityName}`, {
+      model,
+      promptLength: prompt.length,
+      hasApiKey: !!apiKey
     });
 
+    // Make direct fetch call to OpenRouter API
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://shopping-debate.extension',
+        'X-Title': 'Shopping Debate',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
+        stream: true,
+        max_tokens: 300
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+    }
+
     // Process streaming response
-    for await (const chunk of stream) {
-      const content = chunk.choices?.[0]?.delta?.content;
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
-      if (content) {
-        fullResponse += content;
-        sentenceBuffer += content;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-        // Send text chunk to content script for display
-        chrome.tabs.sendMessage(tabId, {
-          type: 'personalityChunk',
-          personality: personalityName,
-          chunk: content
-        });
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n').filter(line => line.trim() !== '');
 
-        // Check if we have complete sentences
-        const { complete, remaining } = extractCompleteSentences(sentenceBuffer);
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') continue;
 
-        // Generate audio for each complete sentence (if voice is enabled)
-        if (enableVoice) {
-          for (const sentence of complete) {
-            console.log(`[Audio] Generating audio for sentence: "${sentence.substring(0, 50)}..."`);
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content;
 
-            // Generate speech audio (runs in parallel with streaming)
-            generateSpeech(sentence, personalityName, voiceSpeed, elevenlabsApiKey).then(audioData => {
-              if (audioData) {
-                // Send audio data to content script
-                chrome.tabs.sendMessage(tabId, {
-                  type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO,
-                  personality: personalityName,
-                  audioData: audioData,
-                  sentence: sentence
-                });
+            if (content) {
+              fullResponse += content;
+              sentenceBuffer += content;
+
+              // Send text chunk to content script for display
+              chrome.tabs.sendMessage(tabId, {
+                type: 'personalityChunk',
+                personality: personalityName,
+                chunk: content
+              });
+
+              // Check if we have complete sentences
+              const { complete, remaining } = extractCompleteSentences(sentenceBuffer);
+
+              // Generate audio for each complete sentence (if voice is enabled)
+              if (enableVoice) {
+                for (const sentence of complete) {
+                  console.log(`[Audio] Generating audio for sentence: "${sentence.substring(0, 50)}..."`);
+
+                  // Generate speech audio (runs in parallel with streaming)
+                  generateSpeech(sentence, personalityName, voiceSpeed, elevenlabsApiKey, currentTheme).then(audioData => {
+                    if (audioData) {
+                      // Send audio data to content script
+                      chrome.tabs.sendMessage(tabId, {
+                        type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO,
+                        personality: personalityName,
+                        audioData: audioData,
+                        sentence: sentence
+                      });
+                    }
+                  }).catch(error => {
+                    console.error(`[Audio] Failed to generate audio for ${personalityName}:`, error);
+                  });
+                }
               }
-            }).catch(error => {
-              console.error(`[Audio] Failed to generate audio for ${personalityName}:`, error);
-            });
+
+              // Update buffer with remaining incomplete text
+              sentenceBuffer = remaining;
+            }
+          } catch (parseError) {
+            console.warn(`[OpenRouter] Failed to parse SSE data:`, parseError);
           }
         }
-
-        // Update buffer with remaining incomplete text
-        sentenceBuffer = remaining;
       }
     }
 
@@ -102,7 +144,7 @@ export async function streamPersonality(prompt, model, apiKey, tabId, personalit
     if (enableVoice && sentenceBuffer.trim().length > 0) {
       console.log(`[Audio] Generating audio for final fragment: "${sentenceBuffer.substring(0, 50)}..."`);
 
-      generateSpeech(sentenceBuffer, personalityName, voiceSpeed, elevenlabsApiKey).then(audioData => {
+      generateSpeech(sentenceBuffer, personalityName, voiceSpeed, elevenlabsApiKey, currentTheme).then(audioData => {
         if (audioData) {
           chrome.tabs.sendMessage(tabId, {
             type: AUDIO_MESSAGE_TYPES.PERSONALITY_AUDIO,

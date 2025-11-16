@@ -70,9 +70,27 @@ export async function handleStreamingDebate(productContext, tabId, apiKeys, getN
 
   } catch (error) {
     console.error('Debate generation error:', error);
+
+    // Create user-friendly error message
+    let errorMessage = 'Sorry, something went wrong generating the debate.';
+
+    if (error.message?.includes('Internal Server Error')) {
+      errorMessage = 'OpenRouter API is experiencing issues. Please try again in a moment.';
+    } else if (error.message?.includes('API key')) {
+      errorMessage = 'API key issue. Please check your settings.';
+    } else if (error.message?.includes('rate limit')) {
+      errorMessage = 'Rate limit reached. Please wait a moment and try again.';
+    }
+
+    console.error('[Debate] Full error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+
     chrome.tabs.sendMessage(tabId, {
       type: MESSAGE_TYPES.DEBATE_ERROR,
-      error: error.message
+      error: errorMessage
     });
   }
 }

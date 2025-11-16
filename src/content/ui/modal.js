@@ -1,19 +1,24 @@
 // Debate Modal UI Module
 
 import { getModalTemplate } from './template.js';
+import { getCurrentTheme } from '../../themes/theme-switcher.js';
 
 let debateModal = null;
 
 /**
  * Create the debate modal UI
+ * @param {string} themeId - Optional theme ID to use
  * @returns {HTMLElement} - The modal element
  */
-export function createDebateModal() {
+export async function createDebateModal(themeId) {
   if (debateModal) return debateModal;
+
+  // Get current theme if not provided
+  const currentTheme = themeId || await getCurrentTheme();
 
   const modal = document.createElement('div');
   modal.id = 'shopping-debate-characters';
-  modal.innerHTML = getModalTemplate();
+  modal.innerHTML = getModalTemplate(currentTheme);
 
   document.body.appendChild(modal);
   debateModal = modal;
@@ -22,9 +27,10 @@ export function createDebateModal() {
 
 /**
  * Show the debate modal
+ * @param {string} themeId - Optional theme ID to use
  */
-export function showDebateModal() {
-  const modal = createDebateModal();
+export async function showDebateModal(themeId) {
+  const modal = await createDebateModal(themeId);
   modal.classList.add('active');
 }
 

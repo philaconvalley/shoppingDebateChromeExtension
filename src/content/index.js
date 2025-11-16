@@ -21,7 +21,7 @@ import {
   attachReconsiderHandler,
   attachProceedHandler
 } from './ui/modal.js';
-import { initializeTheme, getCharacterConfig, getCurrentTheme, THEMES, getThemeConfig } from '../themes/theme-switcher.js';
+import { initializeTheme, getCharacterConfig, getCurrentTheme, THEMES } from '../themes/theme-switcher.js';
 
 // Application state
 let isDebateActive = false;
@@ -33,6 +33,8 @@ const audioQueue = [];
 let isPlayingAudio = false;
 let currentAudio = null;
 let currentSentenceIndex = {};  // Track sentence index per personality
+let audioEnabled = false;  // Track if user has enabled audio
+let autoplayBlocked = false;  // Track if autoplay was blocked
 
 // Text buffering - store text until audio is ready
 const textBuffer = {
@@ -129,6 +131,17 @@ function playNextAudio() {
   // Start playback
   currentAudio.play().catch(error => {
     console.error(`[Audio] Failed to play audio for ${personality}:`, error);
+
+    // Check if this is an autoplay policy error
+    if (!audioEnabled && !autoplayBlocked) {
+      autoplayBlocked = true;
+      showEnableAudioPrompt();
+      console.log('[Audio] Autoplay blocked by browser. Showing enable button.');
+      // Put the audio back in queue for retry after user enables
+      audioQueue.unshift({ personality, audioData, sentence });
+      isPlayingAudio = false;
+      return;
+    }
 
     // Remove speaking indicator
     if (character) {
@@ -265,6 +278,53 @@ function removeAllWordHighlights(personality) {
 }
 
 /**
+ * Show the enable audio prompt when autoplay is blocked
+ */
+function showEnableAudioPrompt() {
+  const modal = getDebateModal();
+  if (!modal) return;
+
+  const prompt = modal.querySelector('.audio-enable-prompt');
+  if (prompt) {
+    prompt.style.display = 'block';
+
+    // Attach click handler to enable button
+    const enableBtn = prompt.querySelector('.enable-audio-btn');
+    if (enableBtn && !enableBtn.hasAttribute('data-handler-attached')) {
+      enableBtn.setAttribute('data-handler-attached', 'true');
+      enableBtn.addEventListener('click', handleEnableAudio);
+    }
+  }
+}
+
+/**
+ * Hide the enable audio prompt
+ */
+function hideEnableAudioPrompt() {
+  const modal = getDebateModal();
+  if (!modal) return;
+
+  const prompt = modal.querySelector('.audio-enable-prompt');
+  if (prompt) {
+    prompt.style.display = 'none';
+  }
+}
+
+/**
+ * Handle enable audio button click
+ */
+function handleEnableAudio() {
+  console.log('[Audio] User enabled audio playback');
+  audioEnabled = true;
+  hideEnableAudioPrompt();
+
+  // Resume audio playback from queue
+  if (audioQueue.length > 0 && !isPlayingAudio) {
+    playNextAudio();
+  }
+}
+
+/**
  * Escape HTML to prevent XSS
  * @param {string} text - Text to escape
  * @returns {string} - Escaped text
@@ -346,7 +406,7 @@ async function startDebate() {
   if (isDebateActive) return;
 
   isDebateActive = true;
-  await showDebateModal();
+  await showDebateModal(currentTheme);
 
   // Attach event handlers
   attachCloseHandler(handleClose);
@@ -478,36 +538,37 @@ if (isCheckoutPage()) {
 
 // Initialize theme on page load
 initializeTheme().then(theme => {
+  currentTheme = theme;
   console.log(`[ShoppingDebate] Content script loaded with theme: ${theme}`);
 });
 
 // Listen for theme changes from popup
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Content] Received message:', message.type);
+
   if (message.type === 'THEME_CHANGED') {
-    console.log(`[ThemeChange] Switching to: ${message.themeId}`);
+    console.log(`[ThemeChange] ✅ Received THEME_CHANGED message`);
+    console.log(`[ThemeChange] Switching from "${currentTheme}" to "${message.themeId}"`);
+
     currentTheme = message.themeId;
-    // Force modal recreation on next open
-    if (debateModal) {
-      debateModal.remove();
-      debateModal = null;
+
+    // Force modal recreation on next open with new theme
+    const modal = getDebateModal();
+    if (modal) {
+      console.log('[ThemeChange] Modal is open, closing it');
+      closeDebateModal();
+    } else {
+      console.log('[ThemeChange] No modal currently open');
     }
-    initializeTheme();
+
+    // Re-initialize theme
+    initializeTheme().then(() => {
+      console.log(`[ThemeChange] Theme initialized to: ${currentTheme}`);
+      sendResponse({ success: true, theme: currentTheme });
+    });
+
+    return true; // Keep message channel open for async response
   }
 });
-
-// Toggle sound
-async function toggleSound() {
-  const { sound = true } = await chrome.storage.sync.get(['sound']);
-  await chrome.storage.sync.set({ sound: !sound });
-  updateSoundToggle();
-}
-
-// Update sound toggle
-async function updateSoundToggle() {
-  if (!debateModal) return;
-  const { sound = true } = await chrome.storage.sync.get(['sound']);
-  const btn = debateModal.querySelector('#sound-toggle-btn');
-  if (btn) btn.textContent = sound ? '🔊' : '🔇';
-}
 
 console.log('Shopping Debate content script loaded');

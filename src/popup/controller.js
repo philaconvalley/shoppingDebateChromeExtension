@@ -37,24 +37,36 @@ async function initializeThemeToggle() {
     btn.addEventListener('click', async () => {
       const themeId = btn.dataset.theme;
 
+      console.log(`[Popup] Theme button clicked: ${themeId}`);
+
       // Update UI
       document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       // Save theme
       await saveTheme(themeId);
-      console.log(`[Theme] Switched to: ${themeId}`);
+      console.log(`[Popup] Theme saved: ${themeId}`);
 
       // Notify all tabs
       const tabs = await chrome.tabs.query({});
+      console.log(`[Popup] Sending THEME_CHANGED to ${tabs.length} tabs`);
+
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
           type: 'THEME_CHANGED',
           themeId: themeId
-        }).catch(() => {
-          // Ignore errors for tabs without content script
+        }).then(() => {
+          console.log(`[Popup] Message sent to tab ${tab.id}`);
+        }).catch((err) => {
+          console.log(`[Popup] Tab ${tab.id} couldn't receive message (no content script)`);
         });
       });
+
+      // Show visual feedback
+      btn.textContent = btn.textContent + ' ✓';
+      setTimeout(() => {
+        btn.textContent = btn.textContent.replace(' ✓', '');
+      }, 1000);
     });
   });
 }

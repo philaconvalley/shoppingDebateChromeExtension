@@ -54,21 +54,68 @@ export const CHECKOUT_PATTERNS = [
   /pay/i
 ];
 
-// Voice configuration for each personality (ElevenLabs)
-export const PERSONALITY_VOICES = {
-  enabler: {
-    voiceId: 'pNInz6obpgDQGcFmaJgB',  // Adam - Warm, enthusiastic voice
-    speed: 1.1         // Slightly faster for energy
+// Voice configuration for each personality by theme (ElevenLabs)
+export const THEME_VOICES = {
+  default: {
+    enabler: {
+      voiceId: 'pNInz6obpgDQGcFmaJgB',  // Adam - Warm, enthusiastic
+      speed: 1.1
+    },
+    skeptic: {
+      voiceId: 'ErXwobaYiN019PkySvjV',  // Antoni - Measured, thoughtful
+      speed: 0.95
+    },
+    mediator: {
+      voiceId: 'VR6AewLTigWG4xSOukaG',  // Arnold - Balanced, calm
+      speed: 1.0
+    }
   },
-  skeptic: {
-    voiceId: 'ErXwobaYiN019PkySvjV', // Antoni - Measured, thoughtful voice
-    speed: 0.95        // Slightly slower for deliberation
+  regina: {
+    enabler: {
+      voiceId: '21m00Tcm4TlvDq8ikWAM',  // Rachel - Sassy, confident (Regina George)
+      speed: 1.2
+    },
+    skeptic: {
+      voiceId: 'EXAVITQu4vr4xnSDxMaL',  // Bella - Nervous, excited (Gretchen)
+      speed: 1.0
+    },
+    mediator: {
+      voiceId: 'MF3mGyEYCl7XYWbV9V6O',  // Elli - Sweet, ditzy (Karen)
+      speed: 0.95
+    }
   },
-  mediator: {
-    voiceId: 'VR6AewLTigWG4xSOukaG',  // Arnold - Balanced, calm voice
-    speed: 1.0         // Normal pace
+  telenovela: {
+    enabler: {
+      voiceId: 'ThT5KcBeYPX3keUQqHPh',  // Dorothy - Dramatic, passionate (Valentina)
+      speed: 1.0
+    },
+    skeptic: {
+      voiceId: 'onwK4e9ZLuTAKqWW03F9',  // Daniel - Deep, brooding (Alejandro)
+      speed: 0.9
+    },
+    mediator: {
+      voiceId: 'XB0fDUnXU5powFXDhCwa',  // Charlotte - Warm, maternal (Isabella)
+      speed: 1.0
+    }
+  },
+  wwf: {
+    enabler: {
+      voiceId: 'TxGEqnHWrfWFTfGW9XjX',  // Josh - Powerful, aggressive (Bulldozer)
+      speed: 1.3
+    },
+    skeptic: {
+      voiceId: 'VR6AewLTigWG4xSOukaG',  // Arnold - Strong, commanding (Steel Fist)
+      speed: 1.1
+    },
+    mediator: {
+      voiceId: 'jsCqWAovK2LkecY7zXl4',  // Freya - Fierce, energetic (Candy Slam)
+      speed: 1.2
+    }
   }
 };
+
+// Legacy - defaults to 'default' theme
+export const PERSONALITY_VOICES = THEME_VOICES.default;
 
 // Audio message types
 export const AUDIO_MESSAGE_TYPES = {

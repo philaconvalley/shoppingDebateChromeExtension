@@ -1,10 +1,17 @@
 // Modal HTML Template
 
+import { getCharacterConfig } from '../../themes/theme-switcher.js';
+
 /**
  * Get the modal HTML template
+ * @param {string} themeId - Current theme ID
  * @returns {string} - HTML template string
  */
-export function getModalTemplate() {
+export function getModalTemplate(themeId = 'default') {
+  const enablerChar = getCharacterConfig(themeId, 'enabler');
+  const skepticChar = getCharacterConfig(themeId, 'skeptic');
+  const mediatorChar = getCharacterConfig(themeId, 'mediator');
+
   return `
     <!-- Price Header with Savings -->
     <div class="debate-price-header">
@@ -30,12 +37,12 @@ export function getModalTemplate() {
     <!-- Enabler Character -->
     <div class="debate-character enabler-character">
       <div class="character-avatar">
-        <div class="avatar-icon">+</div>
+        <div class="avatar-icon">${enablerChar.icon}</div>
         <div class="avatar-pulse"></div>
       </div>
       <div class="speech-bubble">
         <div class="bubble-header">
-          <span class="bubble-name">The Enabler</span>
+          <span class="bubble-name">${enablerChar.name}</span>
           <span class="bubble-status">...</span>
         </div>
         <div class="bubble-content"></div>
@@ -45,12 +52,12 @@ export function getModalTemplate() {
     <!-- Skeptic Character -->
     <div class="debate-character skeptic-character">
       <div class="character-avatar">
-        <div class="avatar-icon">?</div>
+        <div class="avatar-icon">${skepticChar.icon}</div>
         <div class="avatar-pulse"></div>
       </div>
       <div class="speech-bubble">
         <div class="bubble-header">
-          <span class="bubble-name">The Skeptic</span>
+          <span class="bubble-name">${skepticChar.name}</span>
           <span class="bubble-status">...</span>
         </div>
         <div class="bubble-content"></div>
@@ -60,16 +67,22 @@ export function getModalTemplate() {
     <!-- Mediator Character -->
     <div class="debate-character mediator-character">
       <div class="character-avatar">
-        <div class="avatar-icon">=</div>
+        <div class="avatar-icon">${mediatorChar.icon}</div>
         <div class="avatar-pulse"></div>
       </div>
       <div class="speech-bubble">
         <div class="bubble-header">
-          <span class="bubble-name">The Mediator</span>
+          <span class="bubble-name">${mediatorChar.name}</span>
           <span class="bubble-status">...</span>
         </div>
         <div class="bubble-content"></div>
       </div>
+    </div>
+
+    <!-- Enable Audio Button (shown when autoplay blocked) -->
+    <div class="audio-enable-prompt" style="display: none;">
+      <button class="enable-audio-btn">🔊 Click to Enable Audio</button>
+      <p class="audio-help-text">Chrome blocked audio autoplay. Click to hear the debate!</p>
     </div>
 
     <!-- Action Buttons -->

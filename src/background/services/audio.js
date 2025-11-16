@@ -1,6 +1,6 @@
 // Audio Generation Service using ElevenLabs API
 
-import { PERSONALITY_VOICES } from '../../shared/constants.js';
+import { THEME_VOICES } from '../../shared/constants.js';
 
 // Get ElevenLabs API key from environment
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
@@ -11,9 +11,10 @@ const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
  * @param {string} personality - Personality name (enabler, skeptic, mediator)
  * @param {number} speedMultiplier - Global speed multiplier from settings
  * @param {string} apiKey - Optional ElevenLabs API key (defaults to env key)
+ * @param {string} themeId - Theme ID for voice selection (default, regina, telenovela, wwf)
  * @returns {Promise<string>} - Base64 encoded audio data
  */
-export async function generateSpeech(text, personality, speedMultiplier = 1.0, apiKey = null) {
+export async function generateSpeech(text, personality, speedMultiplier = 1.0, apiKey = null, themeId = 'default') {
   // Use provided API key or fall back to environment key
   const elevenlabsKey = apiKey || ELEVENLABS_API_KEY;
 
@@ -22,9 +23,12 @@ export async function generateSpeech(text, personality, speedMultiplier = 1.0, a
     return null;
   }
 
-  const voiceConfig = PERSONALITY_VOICES[personality];
+  // Get voice configuration for the theme
+  const themeVoices = THEME_VOICES[themeId] || THEME_VOICES.default;
+  const voiceConfig = themeVoices[personality];
+
   if (!voiceConfig) {
-    console.error(`[Audio] Unknown personality: ${personality}`);
+    console.error(`[Audio] Unknown personality: ${personality} for theme: ${themeId}`);
     return null;
   }
 
