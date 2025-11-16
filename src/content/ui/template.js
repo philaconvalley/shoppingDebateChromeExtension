@@ -81,7 +81,7 @@ export function getModalTemplate(themeId = 'default') {
 
     <!-- Enable Audio Button (shown when autoplay blocked) -->
     <div class="audio-enable-prompt" style="display: none;">
-      <button class="enable-audio-btn">🔊 Click to Enable Audio</button>
+      <button class="enable-audio-btn">Click to Enable Audio</button>
       <p class="audio-help-text">Chrome blocked audio autoplay. Click to hear the debate!</p>
     </div>
 

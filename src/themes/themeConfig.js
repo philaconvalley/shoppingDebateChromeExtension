@@ -58,7 +58,7 @@ export const THEME_CONFIG = {
       enabler: {
         id: 'regina',
         name: 'Regina George',
-        icon: '👑',
+        icon: 'R',
         gradient: 'linear-gradient(135deg, #FFB6D9 0%, #FF69B4 100%)',
         borderColor: '#FFD700',
         textColor: '#2D1B2E',     // High contrast for readability
@@ -67,7 +67,7 @@ export const THEME_CONFIG = {
       skeptic: {
         id: 'gretchen',
         name: 'Gretchen Wieners',
-        icon: '😬',
+        icon: 'G',
         gradient: 'linear-gradient(135deg, #DDA0DD 0%, #BA55D3 100%)',
         borderColor: '#BA55D3',
         textColor: '#2D1B2E',
@@ -76,7 +76,7 @@ export const THEME_CONFIG = {
       mediator: {
         id: 'karen',
         name: 'Karen Smith',
-        icon: '🤷‍♀️',
+        icon: 'K',
         gradient: 'linear-gradient(135deg, #FFE4E1 0%, #FFC0CB 100%)',
         borderColor: '#FFC0CB',
         textColor: '#2D1B2E',
@@ -87,12 +87,12 @@ export const THEME_CONFIG = {
     // Microcopy
     copy: {
       buttons: {
-        proceed: "That's So Fetch! 💖",
-        reconsider: "Whatever 🙄",
+        proceed: "That's So Fetch!",
+        reconsider: "Whatever",
         remind: "Remind Me Later",
       },
       labels: {
-        savings: "This Month's Wins 👑",
+        savings: "This Month's Wins",
         price: "You're considering:",
       },
     },
@@ -130,7 +130,7 @@ export const THEME_CONFIG = {
       enabler: {
         id: 'valentina',
         name: 'Valentina',
-        icon: '💔',
+        icon: 'V',
         gradient: 'linear-gradient(135deg, #DC143C 0%, #8B0000 100%)',
         borderColor: '#DC143C',
         textColor: '#1A0000',
@@ -139,7 +139,7 @@ export const THEME_CONFIG = {
       skeptic: {
         id: 'alejandro',
         name: 'Alejandro',
-        icon: '😈',
+        icon: 'A',
         gradient: 'linear-gradient(135deg, #4B0082 0%, #2E0854 100%)',
         borderColor: '#4B0082',
         textColor: '#1A0000',
@@ -148,7 +148,7 @@ export const THEME_CONFIG = {
       mediator: {
         id: 'isabella',
         name: 'Isabella',
-        icon: '🕯️',
+        icon: 'I',
         gradient: 'linear-gradient(135deg, #DAA520 0%, #B8860B 100%)',
         borderColor: '#DAA520',
         textColor: '#1A0000',
@@ -158,12 +158,12 @@ export const THEME_CONFIG = {
 
     copy: {
       buttons: {
-        proceed: "¡Sí, Mi Amor! ❤️",
-        reconsider: "¡No Puede Ser! 😱",
+        proceed: "¡Sí, Mi Amor!",
+        reconsider: "¡No Puede Ser!",
         remind: "Más Tarde",
       },
       labels: {
-        savings: "Este Mes 🌹",
+        savings: "Este Mes",
         price: "El Precio del Amor:",
       },
     },
@@ -209,7 +209,7 @@ export const THEME_CONFIG = {
       enabler: {
         id: 'bulldozer',
         name: 'The Bulldozer',
-        icon: '💪',
+        icon: 'B',
         gradient: 'linear-gradient(135deg, #FF4500 0%, #8B0000 100%)',
         borderColor: '#FF4500',
         textColor: '#FFFFFF',
@@ -218,7 +218,7 @@ export const THEME_CONFIG = {
       skeptic: {
         id: 'steelfist',
         name: 'Steel Fist',
-        icon: '👊',
+        icon: 'S',
         gradient: 'linear-gradient(135deg, #1E90FF 0%, #00008B 100%)',
         borderColor: '#1E90FF',
         textColor: '#FFFFFF',
@@ -227,7 +227,7 @@ export const THEME_CONFIG = {
       mediator: {
         id: 'candyslam',
         name: 'Candy Slam',
-        icon: '⚡',
+        icon: 'C',
         gradient: 'linear-gradient(135deg, #FF1493 0%, #8B008B 100%)',
         borderColor: '#FF1493',
         textColor: '#FFFFFF',
@@ -237,12 +237,12 @@ export const THEME_CONFIG = {
 
     copy: {
       buttons: {
-        proceed: "AND THAT'S THE BOTTOM LINE! 💪",
-        reconsider: "TAP OUT! 👎",
+        proceed: "AND THAT'S THE BOTTOM LINE!",
+        reconsider: "TAP OUT!",
         remind: "Ring the Bell Later",
       },
       labels: {
-        savings: "CHAMPIONSHIP STATS 🏆",
+        savings: "CHAMPIONSHIP STATS",
         price: "IN THE RING:",
       },
     },

@@ -190,7 +190,7 @@
 
 /* Championship plate effect */
 [data-theme="wwf"] .debate-price-header::before {
-  content: '🏆';
+  content: '';
   position: absolute;
   top: 50%;
   left: 10px;
@@ -200,7 +200,7 @@
 }
 
 [data-theme="wwf"] .debate-price-header::after {
-  content: '🏆';
+  content: '';
   position: absolute;
   top: 50%;
   right: 10px;
@@ -250,7 +250,7 @@
 }
 
 [data-theme="wwf"] .enabler-character .avatar-icon::before {
-  content: '💪';
+  content: 'B';
 }
 
 /* Steel Fist (Cocky) */
@@ -264,7 +264,7 @@
 }
 
 [data-theme="wwf"] .skeptic-character .avatar-icon::before {
-  content: '👊';
+  content: 'S';
 }
 
 /* Candy Slam (Wild Card) */
@@ -278,7 +278,7 @@
 }
 
 [data-theme="wwf"] .mediator-character .avatar-icon::before {
-  content: '⚡';
+  content: 'C';
 }
 
 
@@ -477,7 +477,7 @@
 [data-theme="wwf"] .bubble-content {
   font-size: 15px;
   line-height: 1.6;
-  color: var(--text-primary);  /* White - High contrast (21:1) ✅ */
+  color: var(--text-primary);  /* White - High contrast (21:1) */
   font-family: var(--font-body);
   font-weight: 700;
   text-transform: uppercase;

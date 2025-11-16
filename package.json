@@ -2,6 +2,26 @@
   "name": "shopping-debate",
   "version": "1.0.0",
   "description": "Chrome extension with AI personalities debating your purchase decisions",
+  "author": "Shopping Debate Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/shopping-debate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/shopping-debate/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/shopping-debate#readme",
+  "keywords": [
+    "chrome-extension",
+    "ai",
+    "shopping",
+    "decision-making",
+    "openrouter",
+    "impulse-control",
+    "budget",
+    "savings-tracker"
+  ],
   "scripts": {
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",

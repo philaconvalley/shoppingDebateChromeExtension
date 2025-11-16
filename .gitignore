@@ -1,13 +1,18 @@
 # Dependencies
 node_modules/
-.claude
+
+# Personal/Development files
+.claude/
+.env
+test-speechify.html
+test-speechify.js
+esbuild.config.js
+OPEN_SOURCE_CHECKLIST.md
+docs/READY_FOR_GITHUB.md
+docs/PUBLISH_TO_GITHUB.md
 
 # Build output
-
-
-# Environment variables
-.env
-.env.example
+dist/
 
 # OS files
 .DS_Store
