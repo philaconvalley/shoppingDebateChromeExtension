@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "New contributor? Start here"
+    url: https://github.com/philaconvalley/shoppingDebateChromeExtension/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
+    about: Browse beginner-friendly issues to find your first contribution
+  - name: Community
+    url: https://www.philaconvalley.com/
+    about: Learn more about PhilaCon Valley

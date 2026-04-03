@@ -1,5 +1,9 @@
 # Shopping Debate - Chrome Extension
 
+![License: MIT](https://img.shields.io/badge/license-MIT-blue)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+![Good First Issues](https://img.shields.io/github/issues/philaconvalley/shoppingDebateChromeExtension/good%20first%20issue?color=7057ff&label=good%20first%20issues)
+
 Three AI personalities debate your purchase decisions before checkout. Make thoughtful choices, not impulsive ones.
 
 ## The Personalities
