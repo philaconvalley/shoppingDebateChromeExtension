@@ -441,13 +441,15 @@ Ideas for future versions:
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](docs/CONTRIBUTING.md) for details on:
+We welcome contributions of all skill levels! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
 - Setting up your development environment
 - Code style guidelines
 - Submitting pull requests
 - Reporting bugs and requesting features
 
-Also review our [Code of Conduct](docs/CODE_OF_CONDUCT.md).
+**New to open source?** Look for issues labeled `good first issue` — testing on e-commerce sites, improving docs, and reporting bugs are great ways to start.
+
+Also review our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
