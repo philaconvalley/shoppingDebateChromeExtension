@@ -6,7 +6,7 @@ Built live by Team PhilaCon Valley ([Waskar Paulino](https://github.com/traksaw)
 
 > **Status**: Not yet published to the Chrome Web Store — currently installable via "Load unpacked" (see [Quick Start](#quick-start) below).
 
-![Shopping Debate modal live on an Amazon product page, showing The Enabler, The Skeptic, and The Mediator responses](docs/screenshots/debate-demo.png)
+![Shopping Debate modal live on an Amazon product page, showing The Enabler, The Skeptic, and The Mediator responses](docs/screenshots/debate-demo.jpg)
 *From the live demo at [CodeTV's Web Dev Challenge S2.E12](https://youtu.be/BOCU-seUXQ8?t=1840) — timestamp 30:40.*
 
 ## The Personalities
