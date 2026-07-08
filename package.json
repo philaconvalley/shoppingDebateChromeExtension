@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/shopping-debate.git"
+    "url": "https://github.com/philaconvalley/shoppingDebateChromeExtension.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/shopping-debate/issues"
+    "url": "https://github.com/philaconvalley/shoppingDebateChromeExtension/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/shopping-debate#readme",
+  "homepage": "https://github.com/philaconvalley/shoppingDebateChromeExtension#readme",
   "keywords": [
     "chrome-extension",
     "ai",

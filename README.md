@@ -2,6 +2,13 @@
 
 Three AI personalities debate your purchase decisions before checkout. Make thoughtful choices, not impulsive ones.
 
+Built live by Team PhilaCon Valley ([Waskar Paulino](https://github.com/traksaw) & [Victor Jackson](https://victordjackson.netlify.app/)) in 4 hours for [CodeTV's Web Dev Challenge S2.E12](https://www.youtube.com/watch?v=BOCU-seUXQ8), sponsored by OpenRouter.
+
+> **Status**: Not yet published to the Chrome Web Store — currently installable via "Load unpacked" (see [Quick Start](#quick-start) below).
+
+![Shopping Debate modal live on an Amazon product page, showing The Enabler, The Skeptic, and The Mediator responses](docs/screenshots/debate-demo.png)
+*From the live demo at [CodeTV's Web Dev Challenge S2.E12](https://youtu.be/BOCU-seUXQ8?t=1840) — timestamp 30:40.*
+
 ## The Personalities
 
 **The Enabler** - Finds genuine value and benefits, creates vivid scenarios of how the purchase improves your life
@@ -455,7 +462,7 @@ MIT License - Free for personal and commercial use
 
 ## Acknowledgments
 
-Built with:
+- Built by Team PhilaCon Valley (Waskar Paulino & Victor Jackson) for [CodeTV's Web Dev Challenge S2.E12](https://www.youtube.com/watch?v=BOCU-seUXQ8), sponsored by OpenRouter
 - [OpenRouter API](https://openrouter.ai) - Multi-model AI access
 - [Webpack](https://webpack.js.org/) - Module bundling
 

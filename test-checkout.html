@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Checkout Page - Shopping Debate</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; max-width: 700px; margin: 60px auto; padding: 0 20px; }
+    h1 { font-size: 20px; }
+    .a-price .a-offscreen { position: absolute; clip: rect(0,0,0,0); }
+    .price-visible { font-size: 24px; font-weight: bold; }
+    #add-to-cart-button { margin-top: 20px; padding: 10px 24px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <p>This page mimics a product page so you can manually trigger and test the Shopping Debate extension without visiting a real e-commerce site.</p>
+
+  <h1 id="productTitle">Sony WH-1000XM5 Wireless Noise Cancelling Headphones</h1>
+
+  <div class="a-price">
+    <span class="a-offscreen">$349.99</span>
+    <span class="price-visible" aria-hidden="true">$349.99</span>
+  </div>
+
+  <ul id="feature-bullets">
+    <li>Industry-leading noise cancellation with two processors</li>
+    <li>30-hour battery life with quick charge</li>
+    <li>Crystal clear hands-free calling</li>
+  </ul>
+
+  <button id="add-to-cart-button">Add to Cart</button>
+</body>
+</html>
